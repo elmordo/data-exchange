@@ -1,0 +1,25 @@
+{
+  "name": "data-exchange",
+  "version": "1.0.0",
+  "description": "Data loading and dumping library",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elmordo/data-exchange.git"
+  },
+  "keywords": [
+    "data",
+    "marshalling",
+    "dumping",
+    "loading"
+  ],
+  "author": "Petr Jindra <el.mordo@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/elmordo/data-exchange/issues"
+  },
+  "homepage": "https://github.com/elmordo/data-exchange#readme"
+}
