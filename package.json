@@ -2,7 +2,8 @@
   "name": "data-exchange",
   "version": "1.0.0",
   "description": "Data loading and dumping library",
-  "main": "index.js",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -21,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/elmordo/data-exchange/issues"
   },
-  "homepage": "https://github.com/elmordo/data-exchange#readme"
+  "homepage": "https://github.com/elmordo/data-exchange#readme",
+  "dependencies": {
+    "typescript": "^3.5.3"
+  }
 }
