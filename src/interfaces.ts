@@ -2,19 +2,31 @@
 
 export interface SchemaInterface
 {
-    load(data: any): any;
+    load(data: Object): any;
 
-    loadDefaults(): any;
-
-    dump(data: any): any;
-
-    dumpDefaults(): any;
+    dump(data: any): Object;
 }
 
 
 export interface FieldInterface
 {
-    dump(val: any): any;
+    name: string;
 
-    load(val: any): any;
+    required: boolean;
+
+    nullable: boolean;
+
+    defaultValue: any;
+
+    dumpName: string;
+
+    dumpOnly: boolean;
+
+    loadName: string;
+
+    loadOnly: boolean;
+
+    dump(val: any, context?: any, result?: any, schema?: SchemaInterface): any;
+
+    load(val: any, context?: any, result?: any, schema?: SchemaInterface): any;
 }
