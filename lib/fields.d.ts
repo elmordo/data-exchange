@@ -70,6 +70,7 @@ interface ParsedDate {
     day: number;
 }
 export declare class Date_ extends DateBase<ParsedDate> {
+    static PARSE_PATTERN_STR: string;
     static PARSE_PATTERN: RegExp;
     dumpValue(val: Date): string;
     protected processParsedData(data: string[]): ParsedDate;
@@ -83,6 +84,7 @@ interface ParsedTime {
     millisecond: number;
 }
 export declare class Time extends DateBase<ParsedTime> {
+    static PARSE_PATTERN_STR: string;
     static PARSE_PATTERN: RegExp;
     dumpValue(val: Date): string;
     protected processParsedData(data: string[]): ParsedTime;
@@ -92,6 +94,7 @@ export declare class Time extends DateBase<ParsedTime> {
 interface ParsedDateTime extends ParsedDate, ParsedTime {
 }
 export declare class DateTime extends DateBase<ParsedDateTime> {
+    static PARSE_PATTERN_STR: string;
     static PARSE_PATTERN: RegExp;
     dumpValue(val: Date): string;
     protected getPattern(): RegExp;

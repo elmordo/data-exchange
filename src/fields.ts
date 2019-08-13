@@ -261,7 +261,8 @@ interface ParsedDate
 
 export class Date_ extends DateBase<ParsedDate>
 {
-    static PARSE_PATTERN = /^([0-9]{4})-([0-9]{2})-([0-9]{2})$/
+    static PARSE_PATTERN_STR = "([0-9]{4})-([0-9]{2})-([0-9]{2})"
+    static PARSE_PATTERN = new RegExp("^" + Date_.PARSE_PATTERN_STR + "$")
 
     dumpValue(val: Date): string
     {
@@ -314,7 +315,20 @@ interface ParsedTime
 
 export class Time extends DateBase<ParsedTime>
 {
-    static PARSE_PATTERN = /^([0-9]{2}):([0-9]{2})(:([0-9]{2})(\.([0-9]{1,3}))?)?$/;
+    /**
+     * allowed patterns are:
+     * - HH:MM
+     * - HH:MM:SS
+     * - HH:MM:SS.mmm
+     *
+     * allowed timezone suffixes are:
+     * - none
+     * - Z (for UTC)
+     * - +HH:MM
+     * @type {RegExp}
+     */
+    static PARSE_PATTERN_STR = "([0-9]{2}):([0-9]{2})(:([0-9]{2})(\.([0-9]{1,3}))?)?(Z|([\+\-])([0-9]{2}):([0-9]{2}))?"
+    static PARSE_PATTERN = new RegExp("^" + Time.PARSE_PATTERN_STR + "$");
 
     dumpValue(val: Date): string
     {
@@ -365,7 +379,8 @@ interface ParsedDateTime extends ParsedDate, ParsedTime
 
 export class DateTime extends DateBase<ParsedDateTime>
 {
-    static PARSE_PATTERN = /([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]{2}):([0-9]{2}):([0-9]{2})(.([0-9]{1,3}))?Z/
+    static PARSE_PATTERN_STR = Date_.PARSE_PATTERN_STR + "T" + Time.PARSE_PATTERN_STR;
+    static PARSE_PATTERN = new RegExp("^" + DateTime.PARSE_PATTERN_STR + "$")
 
     dumpValue(val: Date): string
     {
