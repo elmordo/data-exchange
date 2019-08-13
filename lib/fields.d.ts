@@ -94,13 +94,33 @@ export declare class DateTime extends DateBase<ParsedDateTime> {
     protected processParsedData(data: string[]): ParsedDateTime;
     protected applyParsedData(data: ParsedDateTime, date: Date): void;
 }
-interface NestedSchemaFieldOptions extends BaseOptions {
+interface ComplexFieldOptions extends BaseOptions {
+    required?: boolean;
+    nullable?: boolean;
+}
+export declare abstract class ComplexFieldBase extends Base {
+    required: boolean;
+    nullable: boolean;
+    constructor(options: ComplexFieldOptions);
+    protected assertValue(val: Object): void;
+}
+interface NestedSchemaOptions extends ComplexFieldOptions {
     schema: SchemaInterface;
 }
-export declare class NestedSchemaField extends Base {
-    readonly schema: SchemaInterface;
-    constructor(options: NestedSchemaFieldOptions);
+export declare class NestedSchema extends ComplexFieldBase {
+    schema: SchemaInterface;
+    constructor(options: NestedSchemaOptions);
     dump(val: any): Object;
     load(val: Object): any;
+}
+interface ListOptions extends ComplexFieldOptions {
+    itemField: FieldInterface;
+}
+export declare class List extends ComplexFieldBase {
+    itemField: FieldInterface;
+    constructor(options: ListOptions);
+    load(val: Object[]): any[];
+    dump(val: any[]): Object[];
+    protected assertValue(val: any): void;
 }
 export {};
