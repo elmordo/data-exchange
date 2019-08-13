@@ -5,7 +5,7 @@ import { ErrorReport } from "./errors"
 
 export abstract class AbstractSchema implements SchemaInterface
 {
-    private fields: FieldInterface[];
+    protected fields: FieldInterface[];
 
     private errors: ErrorReport[];
 
@@ -60,7 +60,10 @@ export abstract class AbstractSchema implements SchemaInterface
         return this.errors;
     }
 
-    abstract createFields(): FieldInterface[];
+    createFields(): FieldInterface[]
+    {
+        return [];
+    }
 
     protected createObject(): Object
     {
