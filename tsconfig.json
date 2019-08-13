@@ -3,7 +3,7 @@
         "module": "CommonJS",
         "removeComments": true,
         "target": "es5",
-        "outDir": "./lib"
+        "outDir": "./lib",
     },
     "files": [
         "src/index.ts"
