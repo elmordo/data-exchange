@@ -2,6 +2,7 @@
 import { SchemaInterface, FieldInterface } from "./interfaces"
 import { ErrorReport } from "./errors"
 
+
 export abstract class AbstractSchema implements SchemaInterface
 {
     private fields: FieldInterface[];

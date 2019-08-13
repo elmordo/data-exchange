@@ -1,6 +1,2 @@
 
-export {
-    NumberField,
-    IntField,
-    DateField
-} from "./fields"
+export * from "./fields"

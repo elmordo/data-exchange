@@ -9,22 +9,22 @@ export class UserSchema extends AbstractSchema
     {
         let fields: Fields.AbstractField[] = [];
 
-        fields.push(new Fields.IntField({
+        fields.push(new Fields.Int({
             name: "id",
             loadName: "my_id",
             required: true,
             nullable: false
         }));
-        fields.push(new Fields.StringField({
+        fields.push(new Fields.Str({
             name: "my_name",
             required: true,
             defaultValue: "John Doe"
         }));
-        fields.push(new Fields.StringField({
+        fields.push(new Fields.Str({
             name: "password",
             loadOnly: true,
         }));
-        fields.push(new Fields.DateTimeField({
+        fields.push(new Fields.DateTime({
             name: "created_at",
             dumpOnly: true,
             required: true,

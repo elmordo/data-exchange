@@ -2,7 +2,7 @@
 import { FieldInterface, SchemaInterface } from "./interfaces"
 
 
-interface FieldBaseOptions
+interface BaseOptions
 {
     name: string;
 
@@ -16,7 +16,7 @@ interface FieldBaseOptions
 }
 
 
-export abstract class FieldBase implements FieldInterface
+export abstract class Base implements FieldInterface
 {
     name: string;
 
@@ -28,7 +28,7 @@ export abstract class FieldBase implements FieldInterface
 
     loadOnly: boolean = false;
 
-    constructor(options: FieldBaseOptions)
+    constructor(options: BaseOptions)
     {
         if (!options.dumpName) options.dumpName = options.name;
         if (!options.loadName) options.loadName = options.name;
@@ -47,7 +47,7 @@ export abstract class FieldBase implements FieldInterface
 }
 
 
-interface AbstractFieldOptions extends FieldBaseOptions
+interface AbstractFieldOptions extends BaseOptions
 {
 
     required?: boolean;
@@ -58,7 +58,7 @@ interface AbstractFieldOptions extends FieldBaseOptions
 }
 
 
-export abstract class AbstractField extends FieldBase
+export abstract class AbstractField extends Base
 {
     required: boolean = false;
 
@@ -77,7 +77,7 @@ export abstract class AbstractField extends FieldBase
 }
 
 
-export abstract class CommonFieldBase extends AbstractField
+export abstract class CommonBase extends AbstractField
 {
     dump(val: any): any
     {
@@ -134,7 +134,7 @@ export abstract class CommonFieldBase extends AbstractField
 }
 
 
-export class StringField extends CommonFieldBase
+export class Str extends CommonBase
 {
     dumpValue(val: any): string
     {
@@ -148,7 +148,7 @@ export class StringField extends CommonFieldBase
 }
 
 
-export class NumberField extends CommonFieldBase
+export class Numeric extends CommonBase
 {
     dumpValue(val: any): Number
     {
@@ -172,7 +172,7 @@ export class NumberField extends CommonFieldBase
 }
 
 
-export class IntField extends NumberField
+export class Int extends Numeric
 {
     dumpValue(val: number): number
     {
@@ -191,17 +191,17 @@ export class IntField extends NumberField
 }
 
 
-interface DateFieldOptions extends AbstractFieldOptions
+interface DateBaseOptions extends AbstractFieldOptions
 {
     useUTC?: boolean;
 }
 
 
-export abstract class DateFieldBase<ParsedDataType> extends CommonFieldBase
+export abstract class DateBase<ParsedDataType> extends CommonBase
 {
     useUTC: boolean = true;
 
-    constructor(options: DateFieldOptions)
+    constructor(options: DateBaseOptions)
     {
         super(options);
 
@@ -245,7 +245,7 @@ interface ParsedDate
 }
 
 
-export class DateField extends DateFieldBase<ParsedDate>
+export class Date_ extends DateBase<ParsedDate>
 {
     static PARSE_PATTERN = /^([0-9]{4})-([0-9]{2})-([0-9]{2})$/
 
@@ -265,7 +265,7 @@ export class DateField extends DateFieldBase<ParsedDate>
 
     protected getPattern(): RegExp
     {
-        return DateField.PARSE_PATTERN;
+        return Date_.PARSE_PATTERN;
     }
 
     protected applyParsedData(data: ParsedDate, target: Date): void
@@ -298,7 +298,7 @@ interface ParsedTime
 }
 
 
-export class TimeField extends DateFieldBase<ParsedTime>
+export class Time extends DateBase<ParsedTime>
 {
     static PARSE_PATTERN = /^([0-9]{2}):([0-9]{2})(:([0-9]{2})(\.([0-9]{1,3}))?)?$/;
 
@@ -339,7 +339,7 @@ export class TimeField extends DateFieldBase<ParsedTime>
 
     protected getPattern(): RegExp
     {
-        return TimeField.PARSE_PATTERN;
+        return Time.PARSE_PATTERN;
     }
 }
 
@@ -349,7 +349,7 @@ interface ParsedDateTime extends ParsedDate, ParsedTime
 }
 
 
-export class DateTimeField extends DateFieldBase<ParsedDateTime>
+export class DateTime extends DateBase<ParsedDateTime>
 {
     static PARSE_PATTERN = /([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]{2}):([0-9]{2}):([0-9]{2})(.([0-9]{1,3}))?Z/
 
@@ -360,7 +360,7 @@ export class DateTimeField extends DateFieldBase<ParsedDateTime>
 
     protected getPattern()
     {
-        return DateTimeField.PARSE_PATTERN;
+        return DateTime.PARSE_PATTERN;
     }
 
     protected processParsedData(data: string[]): ParsedDateTime
@@ -398,13 +398,13 @@ export class DateTimeField extends DateFieldBase<ParsedDateTime>
 }
 
 
-interface NestedSchemaFieldOptions extends FieldBaseOptions
+interface NestedSchemaFieldOptions extends BaseOptions
 {
     schema: SchemaInterface;
 }
 
 
-export class NestedSchemaField extends FieldBase
+export class NestedSchemaField extends Base
 {
     readonly schema: SchemaInterface;
 
