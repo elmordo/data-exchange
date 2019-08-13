@@ -48,6 +48,10 @@ export declare class Int extends Numeric {
     dumpValue(val: number): number;
     loadValue(val: any): Number;
 }
+export declare class Bool extends CommonBase {
+    dumpValue(val: any): boolean;
+    loadValue(val: any): boolean;
+}
 interface DateBaseOptions extends AbstractFieldOptions {
     useUTC?: boolean;
 }

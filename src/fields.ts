@@ -191,6 +191,20 @@ export class Int extends Numeric
 }
 
 
+export class Bool extends CommonBase
+{
+    dumpValue(val)
+    {
+        return !!val;
+    }
+
+    loadValue(val)
+    {
+        return !!val;
+    }
+}
+
+
 interface DateBaseOptions extends AbstractFieldOptions
 {
     useUTC?: boolean;
