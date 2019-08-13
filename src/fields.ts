@@ -51,7 +51,7 @@ export abstract class AbstractField implements FieldInterface
 
         if (options.required !== undefined) this.required = options.required;
         if (options.nullable !== undefined) this.nullable = options.nullable;
-        if (options.defaultValue !== undefined) this.defaultValue = false;
+        if (options.defaultValue !== undefined) this.defaultValue = options.defaultValue;
         if (options.dumpOnly !== undefined) this.dumpOnly = options.dumpOnly;
         if (options.loadOnly !== undefined) this.loadOnly = options.loadOnly;
     }
@@ -92,8 +92,8 @@ export abstract class FieldBase extends AbstractField
 
     protected resolveMissingAndNull(val: any): any
     {
-        this.resolveIsMissing(val);
-        this.resolveIsNull(val);
+        val = this.resolveIsMissing(val);
+        return this.resolveIsNull(val);
     }
 
     protected resolveIsMissing(val: any): any
@@ -101,7 +101,7 @@ export abstract class FieldBase extends AbstractField
         if (this.required && val === undefined)
         {
             if (this.defaultValue === undefined)
-                throw new Error("Value is missing");
+                throw new Error("Value " + this.name + " is missing");
 
             val = this.defaultValue;
         }
