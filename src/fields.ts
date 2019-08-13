@@ -400,8 +400,8 @@ export class DateTime extends DateBase<ParsedDateTime>
             day: Number(data[3]),
             hour: Number(data[4]),
             minute: Number(data[5]),
-            second: Number(data[6]),
-            millisecond: (data[8] === undefined) ? 0 : Number(data[8])
+            second: Number(data[7]),
+            millisecond: (data[9] === undefined) ? 0 : Number(data[9])
         };
     }
 
