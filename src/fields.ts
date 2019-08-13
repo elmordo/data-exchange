@@ -137,7 +137,7 @@ export class NumberField extends FieldBase
 {
     dumpValue(val: any): Number
     {
-        let result = Number.parseFloat(val);
+        let result = Number(val);
 
         if (isNaN(result))
             throw new Error("Invalid field input");
@@ -147,7 +147,7 @@ export class NumberField extends FieldBase
 
     loadValue(val: any): Number
     {
-        let result = Number.parseFloat(val);
+        let result = Number(val);
 
         if (isNaN(result))
             throw new Error("Invalid field input");
@@ -166,12 +166,12 @@ export class IntField extends NumberField
 
     loadValue(val: any): Number
     {
-        let result = Number.parseInt(val);
+        let result = Number(val);
 
         if (isNaN(result))
             throw new Error("Invalid field input");
 
-        return result;
+        return Math.floor(result);
     }
 }
 
