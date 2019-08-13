@@ -65,7 +65,7 @@ export abstract class AbstractSchema implements SchemaInterface
         return [];
     }
 
-    protected createObject(): Object
+    createObject(): Object
     {
         return {};
     }

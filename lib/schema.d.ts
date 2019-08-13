@@ -9,6 +9,6 @@ export declare abstract class AbstractSchema implements SchemaInterface {
     hasErrors(): boolean;
     getErrors(): ErrorReport[];
     createFields(): FieldInterface[];
-    protected createObject(): Object;
+    createObject(): Object;
     private getFields;
 }
