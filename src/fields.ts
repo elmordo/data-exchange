@@ -1,5 +1,5 @@
 
-import { FieldInterface } from "./interfaces"
+import { FieldInterface, SchemaInterface } from "./interfaces"
 
 
 interface FieldBaseOptions
@@ -394,5 +394,33 @@ export class DateTimeField extends DateFieldBase<ParsedDateTime>
 
             date.setHours(data.hour, data.minute, data.second, data.millisecond);
         }
+    }
+}
+
+
+interface NestedSchemaFieldOptions extends FieldBaseOptions
+{
+    schema: SchemaInterface;
+}
+
+
+export class NestedSchemaField extends FieldBase
+{
+    readonly schema: SchemaInterface;
+
+    constructor(options: NestedSchemaFieldOptions)
+    {
+        super(options);
+        this.schema = options.schema;
+    }
+
+    dump(val: any): Object
+    {
+        return this.schema.dump(val);
+    }
+
+    load(val: Object): any
+    {
+        return this.schema.load(val);
     }
 }
