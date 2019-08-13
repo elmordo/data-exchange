@@ -12,12 +12,6 @@ export interface FieldInterface
 {
     name: string;
 
-    required: boolean;
-
-    nullable: boolean;
-
-    defaultValue: any;
-
     dumpName: string;
 
     dumpOnly: boolean;

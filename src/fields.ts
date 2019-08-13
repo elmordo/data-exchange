@@ -2,15 +2,9 @@
 import { FieldInterface } from "./interfaces"
 
 
-interface AbstractFieldOptions
+interface FieldBaseOptions
 {
     name: string;
-
-    required?: boolean;
-
-    nullable?: boolean;
-
-    defaultValue?: any;
 
     dumpName?: string;
 
@@ -22,15 +16,9 @@ interface AbstractFieldOptions
 }
 
 
-export abstract class AbstractField implements FieldInterface
+export abstract class FieldBase implements FieldInterface
 {
     name: string;
-
-    required: boolean = false;
-
-    nullable: boolean = true;
-
-    defaultValue: any;
 
     dumpName: string;
 
@@ -40,7 +28,7 @@ export abstract class AbstractField implements FieldInterface
 
     loadOnly: boolean = false;
 
-    constructor(options: AbstractFieldOptions)
+    constructor(options: FieldBaseOptions)
     {
         if (!options.dumpName) options.dumpName = options.name;
         if (!options.loadName) options.loadName = options.name;
@@ -49,9 +37,6 @@ export abstract class AbstractField implements FieldInterface
         this.dumpName = options.dumpName;
         this.loadName = options.loadName;
 
-        if (options.required !== undefined) this.required = options.required;
-        if (options.nullable !== undefined) this.nullable = options.nullable;
-        if (options.defaultValue !== undefined) this.defaultValue = options.defaultValue;
         if (options.dumpOnly !== undefined) this.dumpOnly = options.dumpOnly;
         if (options.loadOnly !== undefined) this.loadOnly = options.loadOnly;
     }
@@ -62,7 +47,37 @@ export abstract class AbstractField implements FieldInterface
 }
 
 
-export abstract class FieldBase extends AbstractField
+interface AbstractFieldOptions extends FieldBaseOptions
+{
+
+    required?: boolean;
+
+    nullable?: boolean;
+
+    defaultValue?: any;
+}
+
+
+export abstract class AbstractField extends FieldBase
+{
+    required: boolean = false;
+
+    nullable: boolean = true;
+
+    defaultValue: any;
+
+    constructor(options: AbstractFieldOptions)
+    {
+        super(options);
+
+        if (options.required !== undefined) this.required = options.required;
+        if (options.nullable !== undefined) this.nullable = options.nullable;
+        if (options.defaultValue !== undefined) this.defaultValue = options.defaultValue;
+    }
+}
+
+
+export abstract class CommonFieldBase extends AbstractField
 {
     dump(val: any): any
     {
@@ -119,7 +134,7 @@ export abstract class FieldBase extends AbstractField
 }
 
 
-export class StringField extends FieldBase
+export class StringField extends CommonFieldBase
 {
     dumpValue(val: any): string
     {
@@ -133,7 +148,7 @@ export class StringField extends FieldBase
 }
 
 
-export class NumberField extends FieldBase
+export class NumberField extends CommonFieldBase
 {
     dumpValue(val: any): Number
     {
@@ -182,7 +197,7 @@ interface DateFieldOptions extends AbstractFieldOptions
 }
 
 
-export abstract class DateFieldBase<ParsedDataType> extends FieldBase
+export abstract class DateFieldBase<ParsedDataType> extends CommonFieldBase
 {
     useUTC: boolean = true;
 
