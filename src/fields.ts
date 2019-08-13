@@ -176,8 +176,23 @@ export class IntField extends NumberField
 }
 
 
+interface DateFieldOptions extends AbstractFieldOptions
+{
+    useUTC?: boolean;
+}
+
+
 export abstract class DateFieldBase<ParsedDataType> extends FieldBase
 {
+    useUTC: boolean = true;
+
+    constructor(options: DateFieldOptions)
+    {
+        super(options);
+
+        if (options.useUTC !== undefined) this.useUTC = options.useUTC;
+    }
+
     loadValue(val: string): Date
     {
         let result = new Date();
@@ -240,9 +255,18 @@ export class DateField extends DateFieldBase<ParsedDate>
 
     protected applyParsedData(data: ParsedDate, target: Date): void
     {
-        target.setUTCFullYear(data.year);
-        target.setUTCMonth(data.month);
-        target.setUTCDate(data.day);
+        if (this.useUTC)
+        {
+            target.setUTCFullYear(data.year);
+            target.setUTCMonth(data.month);
+            target.setUTCDate(data.day);
+        }
+        else
+        {
+            target.setFullYear(data.year);
+            target.setMonth(data.month);
+            target.setDate(data.day);
+        }
     }
 }
 
@@ -286,8 +310,16 @@ export class TimeField extends DateFieldBase<ParsedTime>
 
     protected applyParsedData(parsedData: ParsedTime, targetDate: Date)
     {
-        targetDate.setUTCHours(
-            parsedData.hour, parsedData.minute, parsedData.second, parsedData.millisecond)
+        if (this.useUTC)
+        {
+            targetDate.setUTCHours(
+                parsedData.hour, parsedData.minute, parsedData.second, parsedData.millisecond);
+        }
+        else
+        {
+            targetDate.setHours(
+                parsedData.hour, parsedData.minute, parsedData.second, parsedData.millisecond);
+        }
     }
 
     protected getPattern(): RegExp
@@ -331,10 +363,21 @@ export class DateTimeField extends DateFieldBase<ParsedDateTime>
 
     protected applyParsedData(data: ParsedDateTime, date: Date): void
     {
-        date.setUTCFullYear(data.year);
-        date.setUTCMonth(data.month);
-        date.setUTCDate(data.day);
+        if (this.useUTC)
+        {
+            date.setUTCFullYear(data.year);
+            date.setUTCMonth(data.month);
+            date.setUTCDate(data.day);
 
-        date.setUTCHours(data.hour, data.minute, data.second, data.millisecond);
+            date.setUTCHours(data.hour, data.minute, data.second, data.millisecond);
+        }
+        else
+        {
+            date.setFullYear(data.year);
+            date.setMonth(data.month);
+            date.setDate(data.day);
+
+            date.setHours(data.hour, data.minute, data.second, data.millisecond);
+        }
     }
 }
