@@ -70,6 +70,9 @@ export abstract class AbstractField extends Base
     {
         super(options);
 
+        if (options.required !== undefined && options.nullable === undefined)
+            options.nullable = !options.required;
+
         if (options.required !== undefined) this.required = options.required;
         if (options.nullable !== undefined) this.nullable = options.nullable;
         if (options.defaultValue !== undefined) this.defaultValue = options.defaultValue;
@@ -446,6 +449,9 @@ export abstract class ComplexFieldBase extends Base
     constructor(options: ComplexFieldOptions)
     {
         super(options);
+
+        if (options.required !== undefined && options.nullable === undefined)
+            options.nullable = !options.required;
 
         if (options.required !== undefined) this.required = options.required;
         if (options.nullable !== undefined) this.nullable = options.nullable;
