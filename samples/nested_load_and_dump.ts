@@ -44,7 +44,8 @@ class MessageSchema extends AbstractSchema
             new Fields.Int({name: "id", required: true}),
             new Fields.Str({name: "subject", required: true}),
             new Fields.Str({name: "body", defaultValue: null}),
-            new Fields.NestedSchema({name: "user", schema: new UserSchema()})
+            new Fields.NestedSchema({name: "user", schema: new UserSchema()}),
+            new Fields.List({name: "recipients", itemField: new Fields.Str({name: ""})})
         ]
     }
 }
@@ -52,12 +53,12 @@ class MessageSchema extends AbstractSchema
 
 let schema = new MessageSchema();
 
-let dumpData = {id: 1, subject: "hi!", user: {my_id: 1, created_at: new Date(), password: "my-secret-password"}};
+let dumpData = {id: 1, subject: "hi!", user: {my_id: 1, created_at: new Date(), password: "my-secret-password"}, recipients: ["Alice", "Bob", "Žitomír"]};
 
 // 'my_id' is renamed to 'id', 'password' is ignored and 'my_name' is set to 'John Doe'
 console.log("DUMPING DATA");
 console.log(schema.dump(dumpData));
 
-let loadData = {id: 2, subject: "hello!", body: "good bye!",user: {id: 6, created_at: new Date(), password: "my-secret-password", my_name: "Mr. Dead"}};
+let loadData = {id: 2, subject: "hello!", body: "good bye!",user: {id: 6, created_at: new Date(), password: "my-secret-password", my_name: "Mr. Dead"}, recipients: ["Alice", "Bob", "Žitomír"]};
 console.log("LOADING DATA");
 console.log(schema.load(loadData));

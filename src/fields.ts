@@ -430,7 +430,7 @@ export abstract class ComplexFieldBase extends Base
 }
 
 
-interface NestedSchemaFieldOptions extends ComplexFieldOptions
+interface NestedSchemaOptions extends ComplexFieldOptions
 {
     schema: SchemaInterface;
 }
@@ -440,7 +440,7 @@ export class NestedSchema extends ComplexFieldBase
 {
     schema: SchemaInterface;
 
-    constructor(options: NestedSchemaFieldOptions)
+    constructor(options: NestedSchemaOptions)
     {
         super(options);
         this.schema = options.schema;
@@ -449,12 +449,54 @@ export class NestedSchema extends ComplexFieldBase
     dump(val: any): Object
     {
         this.assertValue(val);
+        if (!val) return val;
         return this.schema.dump(val);
     }
 
     load(val: Object): any
     {
         this.assertValue(val);
+        if (!val) return val;
         return this.schema.load(val);
+    }
+}
+
+
+interface ListOptions extends ComplexFieldOptions
+{
+    itemField: FieldInterface;
+}
+
+
+export class List extends ComplexFieldBase
+{
+    itemField: FieldInterface;
+
+    constructor(options: ListOptions)
+    {
+        super(options);
+        this.itemField = options.itemField;
+    }
+
+    load(val: Object[]): any[]
+    {
+        this.assertValue(val);
+        if (!val) return val;
+        return val.map(x => this.itemField.load(x));
+    }
+
+    dump(val: any[]): Object[]
+    {
+        this.assertValue(val);
+        if (!val) return val;
+        return val.map(x => this.itemField.dump(x));
+    }
+
+    protected assertValue(val: any): void
+    {
+        super.assertValue(val);
+
+        if (val && !(val instanceof Array))
+            throw new Error("Value must be instance of Array");
     }
 }
