@@ -398,15 +398,47 @@ export class DateTime extends DateBase<ParsedDateTime>
 }
 
 
-interface NestedSchemaFieldOptions extends BaseOptions
+interface ComplexFieldOptions extends BaseOptions
+{
+    required?: boolean;
+
+    nullable?: boolean;
+}
+
+
+
+export abstract class ComplexFieldBase extends Base
+{
+
+    required: boolean = false;
+
+    nullable: boolean = true;
+
+    constructor(options: ComplexFieldOptions)
+    {
+        super(options);
+
+        if (options.required !== undefined) this.required = options.required;
+        if (options.nullable !== undefined) this.nullable = options.nullable;
+    }
+
+    protected assertValue(val: Object): void
+    {
+        if (this.required && val === undefined) throw new Error("Value '" + this.name + "' is required");
+        if (!this.nullable && val === null) throw new Error("Value '" + this.name + "' cannot be null");
+    }
+}
+
+
+interface NestedSchemaFieldOptions extends ComplexFieldOptions
 {
     schema: SchemaInterface;
 }
 
 
-export class NestedSchemaField extends Base
+export class NestedSchema extends ComplexFieldBase
 {
-    readonly schema: SchemaInterface;
+    schema: SchemaInterface;
 
     constructor(options: NestedSchemaFieldOptions)
     {
@@ -416,11 +448,13 @@ export class NestedSchemaField extends Base
 
     dump(val: any): Object
     {
+        this.assertValue(val);
         return this.schema.dump(val);
     }
 
     load(val: Object): any
     {
+        this.assertValue(val);
         return this.schema.load(val);
     }
 }

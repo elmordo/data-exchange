@@ -44,7 +44,7 @@ class MessageSchema extends AbstractSchema
             new Fields.Int({name: "id", required: true}),
             new Fields.Str({name: "subject", required: true}),
             new Fields.Str({name: "body", defaultValue: null}),
-            new Fields.NestedSchemaField({name: "user", schema: new UserSchema()})
+            new Fields.NestedSchema({name: "user", schema: new UserSchema()})
         ]
     }
 }
