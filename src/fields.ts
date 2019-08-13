@@ -84,7 +84,7 @@ export abstract class CommonBase extends AbstractField
         if (this.loadOnly) throw new Error("This field is load only");
         val = this.resolveMissingAndNull(val);
 
-        if (val !== null)
+        if (val !== null && val !== undefined)
             val = this.dumpValue(val);
 
         return val;
@@ -95,7 +95,7 @@ export abstract class CommonBase extends AbstractField
         if (this.dumpOnly) throw new Error("This field is dump only");
         val = this.resolveMissingAndNull(val);
 
-        if (val !== null)
+        if (val !== null && val !== undefined)
             val = this.loadValue(val);
 
         return val;
@@ -113,9 +113,9 @@ export abstract class CommonBase extends AbstractField
 
     protected resolveIsMissing(val: any): any
     {
-        if (this.required && val === undefined)
+        if (val === undefined)
         {
-            if (this.defaultValue === undefined)
+            if (this.required && this.defaultValue === undefined)
                 throw new Error("Value " + this.name + " is missing");
 
             val = this.defaultValue;
