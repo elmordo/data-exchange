@@ -130,7 +130,7 @@ export abstract class CommonBase extends AbstractField
     protected resolveIsNull(val: any): any
     {
         if (val === null && !this.nullable)
-            throw new Error("Value is NULL");
+            throw new Error("Value '" + this.name + "' is NULL");
 
         return val;
     }
@@ -327,7 +327,7 @@ export class Time extends DateBase<ParsedTime>
      * allowed timezone suffixes are:
      * - none
      * - Z (for UTC)
-     * - +HH:MM
+     * - +/-HH:MM
      * @type {RegExp}
      */
     static PARSE_PATTERN_STR = "([0-9]{2}):([0-9]{2})(:([0-9]{2})(\.([0-9]{1,3}))?)?(Z|([\+\-])([0-9]{2}):([0-9]{2}))?"
