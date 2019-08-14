@@ -239,7 +239,7 @@ export abstract class DateBase<ParsedDataType> extends CommonBase
         let result = pattern.exec(val);
 
         if (result === null)
-            throw new Error("Invalid date format");
+            throw new Error("Invalid date format in field '" + this.name + "'");
 
         return this.processParsedData(result);
     }
