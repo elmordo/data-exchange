@@ -9,45 +9,50 @@ export class UserSchema extends AbstractSchema
     {
         let fields: Fields.AbstractField[] = [];
 
-        fields.push(new Fields.Int({
-            name: "id",
-            loadName: "my_id",
-            required: true,
-            nullable: false
-        }));
-        fields.push(new Fields.Str({
-            name: "my_name",
-            required: true,
-            defaultValue: "John Doe"
-        }));
-        fields.push(new Fields.Str({
-            name: "password",
-            loadOnly: true,
-        }));
-        fields.push(new Fields.DateTime({
-            name: "created_at",
-            dumpOnly: true,
-            required: true,
-            nullable: false
-        }));
+        fields.push(new Fields.Int(
+            "id", {
+                loadName: "my_id",
+                required: true,
+                nullable: false
+            }
+        ));
+        fields.push(new Fields.Str(
+            "my_name",
+            {
+                required: true,
+                defaultValue: "John Doe"
+            }
+        ));
+        fields.push(new Fields.Str(
+            "password",
+            {
+                loadOnly: true,
+            }
+        ));
+        fields.push(new Fields.DateTime(
+            "created_at",
+            {
+                dumpOnly: true,
+                required: true,
+                nullable: false
+            }
+        ));
 
         return fields
     }
 }
 
 
+// fields can be defined in inline property
 class MessageSchema extends AbstractSchema
 {
-    createFields()
-    {
-        return [
-            new Fields.Int({name: "id", required: true}),
-            new Fields.Str({name: "subject", required: true}),
-            new Fields.Str({name: "body", defaultValue: null}),
-            new Fields.NestedSchema({name: "user", schema: new UserSchema()}),
-            new Fields.List({name: "recipients", itemField: new Fields.Str({name: ""})})
-        ]
-    }
+    fields = [
+        new Fields.Int("id", {required: true}),
+        new Fields.Str("subject", {required: true}),
+        new Fields.Str("body", {defaultValue: null}),
+        new Fields.NestedSchema("user", new UserSchema()),
+        new Fields.List("recipients", new Fields.Str(""))
+    ]
 }
 
 

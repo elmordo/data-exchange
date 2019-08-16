@@ -1,6 +1,5 @@
 import { FieldInterface, SchemaInterface } from "./interfaces";
 interface BaseOptions {
-    name: string;
     dumpName?: string;
     dumpOnly?: boolean;
     loadName?: string;
@@ -12,9 +11,10 @@ export declare abstract class Base implements FieldInterface {
     dumpOnly: boolean;
     loadName: string;
     loadOnly: boolean;
-    constructor(options: BaseOptions);
+    constructor(name: string, options?: BaseOptions);
     abstract dump(val: any): any;
     abstract load(val: any): any;
+    protected prepareOptions<OptionsType>(options?: OptionsType): OptionsType;
 }
 interface AbstractFieldOptions extends BaseOptions {
     required?: boolean;
@@ -25,16 +25,16 @@ export declare abstract class AbstractField extends Base {
     required: boolean;
     nullable: boolean;
     defaultValue: any;
-    constructor(options: AbstractFieldOptions);
+    constructor(name: string, options?: AbstractFieldOptions);
+    protected resolveMissingAndNull(val: any): any;
+    protected resolveIsMissing(val: any): any;
+    protected resolveIsNull(val: any): any;
 }
 export declare abstract class CommonBase extends AbstractField {
     dump(val: any): any;
     load(val: any): any;
     abstract dumpValue(val: any): any;
     abstract loadValue(val: any): any;
-    protected resolveMissingAndNull(val: any): any;
-    protected resolveIsMissing(val: any): any;
-    protected resolveIsNull(val: any): any;
 }
 export declare class Str extends CommonBase {
     dumpValue(val: any): string;
@@ -57,7 +57,7 @@ interface DateBaseOptions extends AbstractFieldOptions {
 }
 export declare abstract class DateBase<ParsedDataType> extends CommonBase {
     useUTC: boolean;
-    constructor(options: DateBaseOptions);
+    constructor(name: string, options?: DateBaseOptions);
     loadValue(val: string): Date;
     protected parseData(val: string): ParsedDataType;
     protected abstract processParsedData(data: string[]): ParsedDataType;
@@ -101,33 +101,19 @@ export declare class DateTime extends DateBase<ParsedDateTime> {
     protected processParsedData(data: string[]): ParsedDateTime;
     protected applyParsedData(data: ParsedDateTime, date: Date): void;
 }
-interface ComplexFieldOptions extends BaseOptions {
-    required?: boolean;
-    nullable?: boolean;
-}
-export declare abstract class ComplexFieldBase extends Base {
-    required: boolean;
-    nullable: boolean;
-    constructor(options: ComplexFieldOptions);
-    protected assertValue(val: Object): void;
-}
-interface NestedSchemaOptions extends ComplexFieldOptions {
-    schema: SchemaInterface;
+export declare abstract class ComplexFieldBase extends AbstractField {
 }
 export declare class NestedSchema extends ComplexFieldBase {
     schema: SchemaInterface;
-    constructor(options: NestedSchemaOptions);
+    constructor(name: string, schema: SchemaInterface, options?: AbstractFieldOptions);
     dump(val: any): Object;
     load(val: Object): any;
 }
-interface ListOptions extends ComplexFieldOptions {
-    itemField: FieldInterface;
-}
 export declare class List extends ComplexFieldBase {
     itemField: FieldInterface;
-    constructor(options: ListOptions);
+    constructor(name: string, itemField: FieldInterface, options?: AbstractFieldOptions);
     load(val: Object[]): any[];
     dump(val: any[]): Object[];
-    protected assertValue(val: any): void;
+    protected resolveMissingAndNull(val: any): void;
 }
 export {};

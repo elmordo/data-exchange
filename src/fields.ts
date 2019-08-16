@@ -4,8 +4,6 @@ import { FieldInterface, SchemaInterface } from "./interfaces"
 
 interface BaseOptions
 {
-    name: string;
-
     dumpName?: string;
 
     dumpOnly?: boolean;
@@ -28,12 +26,13 @@ export abstract class Base implements FieldInterface
 
     loadOnly: boolean = false;
 
-    constructor(options: BaseOptions)
+    constructor(name: string, options?: BaseOptions)
     {
-        if (!options.dumpName) options.dumpName = options.name;
-        if (!options.loadName) options.loadName = options.name;
+        options = this.prepareOptions(options);
+        if (!options.dumpName) options.dumpName = name;
+        if (!options.loadName) options.loadName = name;
 
-        this.name = options.name;
+        this.name = name;
         this.dumpName = options.dumpName;
         this.loadName = options.loadName;
 
@@ -44,6 +43,11 @@ export abstract class Base implements FieldInterface
     abstract dump(val: any): any;
 
     abstract load(val: any): any;
+
+    protected prepareOptions<OptionsType>(options?: OptionsType): OptionsType
+    {
+        return options ? options : {} as any;
+    }
 }
 
 
@@ -66,9 +70,10 @@ export abstract class AbstractField extends Base
 
     defaultValue: any;
 
-    constructor(options: AbstractFieldOptions)
+    constructor(name: string, options?: AbstractFieldOptions)
     {
-        super(options);
+        super(name, options);
+        options = this.prepareOptions(options);
 
         if (options.required !== undefined && options.nullable === undefined)
             options.nullable = !options.required;
@@ -76,6 +81,33 @@ export abstract class AbstractField extends Base
         if (options.required !== undefined) this.required = options.required;
         if (options.nullable !== undefined) this.nullable = options.nullable;
         if (options.defaultValue !== undefined) this.defaultValue = options.defaultValue;
+    }
+
+    protected resolveMissingAndNull(val: any): any
+    {
+        val = this.resolveIsMissing(val);
+        return this.resolveIsNull(val);
+    }
+
+    protected resolveIsMissing(val: any): any
+    {
+        if (val === undefined)
+        {
+            if (this.required && this.defaultValue === undefined)
+                throw new Error("Value " + this.name + " is missing");
+
+            val = this.defaultValue;
+        }
+
+        return val;
+    }
+
+    protected resolveIsNull(val: any): any
+    {
+        if (val === null && !this.nullable)
+            throw new Error("Value '" + this.name + "' is NULL");
+
+        return val;
     }
 }
 
@@ -107,33 +139,6 @@ export abstract class CommonBase extends AbstractField
     abstract dumpValue(val: any): any;
 
     abstract loadValue(val: any): any;
-
-    protected resolveMissingAndNull(val: any): any
-    {
-        val = this.resolveIsMissing(val);
-        return this.resolveIsNull(val);
-    }
-
-    protected resolveIsMissing(val: any): any
-    {
-        if (val === undefined)
-        {
-            if (this.required && this.defaultValue === undefined)
-                throw new Error("Value " + this.name + " is missing");
-
-            val = this.defaultValue;
-        }
-
-        return val;
-    }
-
-    protected resolveIsNull(val: any): any
-    {
-        if (val === null && !this.nullable)
-            throw new Error("Value '" + this.name + "' is NULL");
-
-        return val;
-    }
 }
 
 
@@ -218,9 +223,10 @@ export abstract class DateBase<ParsedDataType> extends CommonBase
 {
     useUTC: boolean = true;
 
-    constructor(options: DateBaseOptions)
+    constructor(name: string, options?: DateBaseOptions)
     {
-        super(options);
+        super(name, options);
+        options = this.prepareOptions(options);
 
         if (options.useUTC !== undefined) this.useUTC = options.useUTC;
     }
@@ -430,44 +436,8 @@ export class DateTime extends DateBase<ParsedDateTime>
 }
 
 
-interface ComplexFieldOptions extends BaseOptions
+export abstract class ComplexFieldBase extends AbstractField
 {
-    required?: boolean;
-
-    nullable?: boolean;
-}
-
-
-
-export abstract class ComplexFieldBase extends Base
-{
-
-    required: boolean = false;
-
-    nullable: boolean = true;
-
-    constructor(options: ComplexFieldOptions)
-    {
-        super(options);
-
-        if (options.required !== undefined && options.nullable === undefined)
-            options.nullable = !options.required;
-
-        if (options.required !== undefined) this.required = options.required;
-        if (options.nullable !== undefined) this.nullable = options.nullable;
-    }
-
-    protected assertValue(val: Object): void
-    {
-        if (this.required && val === undefined) throw new Error("Value '" + this.name + "' is required");
-        if (!this.nullable && val === null) throw new Error("Value '" + this.name + "' cannot be null");
-    }
-}
-
-
-interface NestedSchemaOptions extends ComplexFieldOptions
-{
-    schema: SchemaInterface;
 }
 
 
@@ -475,31 +445,26 @@ export class NestedSchema extends ComplexFieldBase
 {
     schema: SchemaInterface;
 
-    constructor(options: NestedSchemaOptions)
+    constructor(name: string, schema: SchemaInterface, options?: AbstractFieldOptions)
     {
-        super(options);
-        this.schema = options.schema;
+        super(name, options);
+        options = this.prepareOptions(options);
+        this.schema = schema;
     }
 
     dump(val: any): Object
     {
-        this.assertValue(val);
+        this.resolveMissingAndNull(val);
         if (!val) return val;
         return this.schema.dump(val);
     }
 
     load(val: Object): any
     {
-        this.assertValue(val);
+        this.resolveMissingAndNull(val);
         if (!val) return val;
         return this.schema.load(val);
     }
-}
-
-
-interface ListOptions extends ComplexFieldOptions
-{
-    itemField: FieldInterface;
 }
 
 
@@ -507,29 +472,30 @@ export class List extends ComplexFieldBase
 {
     itemField: FieldInterface;
 
-    constructor(options: ListOptions)
+    constructor(name: string, itemField: FieldInterface, options?: AbstractFieldOptions)
     {
-        super(options);
-        this.itemField = options.itemField;
+        super(name, options);
+        options = this.prepareOptions(options);
+        this.itemField = itemField;
     }
 
     load(val: Object[]): any[]
     {
-        this.assertValue(val);
+        this.resolveMissingAndNull(val);
         if (!val) return val;
         return val.map(x => this.itemField.load(x));
     }
 
     dump(val: any[]): Object[]
     {
-        this.assertValue(val);
+        this.resolveMissingAndNull(val);
         if (!val) return val;
         return val.map(x => this.itemField.dump(x));
     }
 
-    protected assertValue(val: any): void
+    protected resolveMissingAndNull(val: any): void
     {
-        super.assertValue(val);
+        super.resolveMissingAndNull(val);
 
         if (val && !(val instanceof Array))
             throw new Error("Value must be instance of Array");
