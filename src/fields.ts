@@ -2,30 +2,75 @@
 import { FieldInterface, SchemaInterface } from "./interfaces"
 
 
+/**
+ * common field options
+ * @type {Object}
+ */
 interface BaseOptions
 {
+    /**
+     * name of the attribute where data will be dumped
+     * @type {string}
+     */
     dumpName?: string;
 
+    /**
+     * true if field is only dumped (it is skipped on load)
+     * @type {boolean}
+     */
     dumpOnly?: boolean;
 
+    /**
+     * name of the attribute where data will be loaded from
+     * @type {string}
+     */
     loadName?: string;
 
+    /**
+     * true if attributed is load only (it is skipped on dump)
+     * @type {boolean}
+     */
     loadOnly?: boolean;
 }
 
 
 export abstract class Base implements FieldInterface
 {
+    /**
+     * name (identifier) of the field
+     * @type {string}
+     */
     name: string;
 
+    /**
+     * name of the attribute where data will be dumped
+     * @type {string}
+     */
     dumpName: string;
 
+    /**
+     * true if field is only dumped (it is skipped on load)
+     * @type {boolean}
+     */
     dumpOnly: boolean = false;
 
+    /**
+     * name of the attribute where data will be loaded from
+     * @type {string}
+     */
     loadName: string;
 
+    /**
+     * true if attributed is load only (it is skipped on dump)
+     * @type {boolean}
+     */
     loadOnly: boolean = false;
 
+    /**
+     * create and initialize instance
+     * @param {string}      name    name of the field
+     * @param {BaseOptions} options options
+     */
     constructor(name: string, options?: BaseOptions)
     {
         options = this.prepareOptions(options);
@@ -40,10 +85,29 @@ export abstract class Base implements FieldInterface
         if (options.loadOnly !== undefined) this.loadOnly = options.loadOnly;
     }
 
-    abstract dump(val: any): any;
+    /**
+     * dump value to raw JSON object
+     * @param  {any}             val     value to be dumped
+     * @param  {any}             context data context (dump source object)
+     * @param  {any}             result  actual result data
+     * @param  {SchemaInterface} schema  schema where field is processed
+     * @return {any}                     dumped value
+     */
+    abstract dump(val: any, context?: any, result?: any, schema?: SchemaInterface): any;
 
-    abstract load(val: any): any;
+    /**
+     * load value from raw JSON object
+     * @param  {any}             val     value to be loaded
+     * @param  {any}             context data context (load source object)
+     * @param  {any}             result  actual result data
+     * @param  {SchemaInterface} schema  schema where field is processed
+     * @return {any}                     dumped value
+     */
+    abstract load(val: any, context?: any, result?: any, schema?: SchemaInterface): any;
 
+    /**
+     * prepare options for use
+     */
     protected prepareOptions<OptionsType>(options?: OptionsType): OptionsType
     {
         return options ? options : {} as any;
@@ -51,25 +115,84 @@ export abstract class Base implements FieldInterface
 }
 
 
+/**
+ * basic options for the abstract fields
+ * @type {Object}
+ */
 interface AbstractFieldOptions extends BaseOptions
 {
-
+    /**
+     * is field value required?
+     * @type {boolean}
+     */
     required?: boolean;
 
+    /**
+     * can be value null?
+     * @type {boolean}
+     */
     nullable?: boolean;
 
+    /**
+     * default value if value is not presented
+     * @type {any}
+     */
     defaultValue?: any;
 }
 
 
+/**
+ * base class for most fields, adding some functionality to the minimal field implementation
+ * provided by Base class.
+ *
+ * * required - if true, field key has to be presented in processed object
+ * * nullable - if true, value stored under the key can be null
+ * * defaultValue - if key is missing, the defaultVaulue is used. If defaultValue is set to the
+ *     other value then undefined, required test is always passed. If defaultValue is set to the
+ *     other value then undefiend and null, both required and nullable tests are always passed.
+ *
+ * The required and nullable options are following behaviour:
+ *
+ *   OPTIONS            PROPERTY
+ *  ----------         ----------
+ *  REQ | NULL         REQ | NULL
+ *   U  |  U            F  |  T
+ *   X  |  U     ==>    X  |  !X
+ *   U  |  Y            F  |  Y
+ *   X  |  Y            X  |  Y
+ *
+ * U  - undefined
+ * X  - value set to the required option
+ * Y  - value set to the nullable option
+ * !X - negated X
+ *
+ * @type {Object}
+ */
 export abstract class AbstractField extends Base
 {
+    /**
+     * is field requried?
+     * @type {boolean}
+     */
     required: boolean = false;
 
+    /**
+     * is field nullable?
+     * @type {boolean}
+     */
     nullable: boolean = true;
 
+    /**
+     * default value
+     * @type {any}
+     */
     defaultValue: any;
 
+    /**
+     * create and initialize instance
+     * @param {string}               name    name of the field
+     * @param {AbstractFieldOptions} options options
+     */
     constructor(name: string, options?: AbstractFieldOptions)
     {
         super(name, options);
@@ -83,12 +206,22 @@ export abstract class AbstractField extends Base
         if (options.defaultValue !== undefined) this.defaultValue = options.defaultValue;
     }
 
+    /**
+     * resolve basic validation tests (required and missing)
+     * @param  {any} val value passed to the test
+     * @return {any}     processed value (default value if passed value was undefined)
+     */
     protected resolveMissingAndNull(val: any): any
     {
         val = this.resolveIsMissing(val);
         return this.resolveIsNull(val);
     }
 
+    /**
+     * throw error if value is missing (value is undefined) and no defaultValue is set.
+     * @param  {any} val value to be tested
+     * @return {any}     processed value (defaultValue if some default value is set)
+     */
     protected resolveIsMissing(val: any): any
     {
         if (val === undefined)
@@ -102,6 +235,11 @@ export abstract class AbstractField extends Base
         return val;
     }
 
+    /**
+     * throw error if value is null
+     * @param  {any} val value to be tested
+     * @return {any}     passed value
+     */
     protected resolveIsNull(val: any): any
     {
         if (val === null && !this.nullable)
