@@ -23,7 +23,7 @@
     "url": "https://github.com/elmordo/data-exchange/issues"
   },
   "homepage": "https://github.com/elmordo/data-exchange#readme",
-  "dependencies": {
-    "typescript": "^3.5.3"
+  "devDependencies": {
+    "typescript": "^3.6.2"
   }
 }
