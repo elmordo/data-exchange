@@ -579,7 +579,7 @@ export abstract class ComplexFieldBase extends AbstractField
 }
 
 
-export class NestedSchema extends ComplexFieldBase
+export class Nested extends ComplexFieldBase
 {
     schema: SchemaInterface;
 
