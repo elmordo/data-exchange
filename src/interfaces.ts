@@ -78,3 +78,51 @@ export interface FieldInterface
      */
     load(val: any, context?: any, result?: any, schema?: SchemaInterface): any;
 }
+
+
+/**
+ * validation error report
+ * @type {Object}
+ */
+export interface ErrorReportInterface
+{
+
+    readonly reason: string;
+
+    readonly code: number;
+
+    readonly type: string;
+
+    readonly field: FieldInterface;
+
+    readonly data: any;
+
+    readonly schema: SchemaInterface)
+}
+
+
+
+export interface FilterInterface
+{
+    filter(val: any): any;
+}
+
+
+export interface ValidatorInterface
+{
+    /**
+     * test value is valid
+     * @param  {any}             val     value to validate
+     * @param  {any}             context all data
+     * @param  {any}             result  current result
+     * @param  {SchemaInterface} schema  schema instance
+     * @return {boolean}                 true if value is valid, false otherwise
+     */
+    validate(val: any, context?: any, result?: any, schema?: SchemaInterface): boolean;
+
+    /**
+     * get list of last validation errors
+     * @return {ErrorReportInterface[]} [description]
+     */
+    getLastErrors(): ErrorReportInterface[];
+}

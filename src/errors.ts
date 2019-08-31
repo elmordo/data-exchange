@@ -1,12 +1,12 @@
 
-import { SchemaInterface, FieldInterface } from "./interfaces"
+import { SchemaInterface, FieldInterface, ErrorReportInterface } from "./interfaces"
 
 
 /**
  * validation error report
  * @type {Object}
  */
-export class ErrorReport
+export class ErrorReport implements ErrorReportInterface
 {
     /**
      * create and initialize instance

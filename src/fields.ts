@@ -1,5 +1,21 @@
 
-import { FieldInterface, SchemaInterface } from "./interfaces"
+import { FieldInterface, SchemaInterface, FilterInterface, ValidatorInterface } from "./interfaces"
+
+
+interface FilterSettings
+{
+    inFilters: FilterInterface[];
+
+    outFilters: FilterInterface[];
+}
+
+
+interface ValidatorSettings
+{
+    inValidators: ValidatorInterface[];
+
+    outValidators: ValidatorInterface[];
+}
 
 
 /**
@@ -31,6 +47,19 @@ interface BaseOptions
      * @type {boolean}
      */
     loadOnly?: boolean;
+
+    /**
+     * filter settings
+     * if list of filters is given, the order of filters is for an input and reverse list of filters
+     * is used for an output
+     */
+    filters: FilterSettings|FilterInterface[];
+
+    /**
+     * validator settings
+     * if list of validators is given, same list is used for input and output
+     */
+    validators: ValidatorSettings|ValidatorInterface[];
 }
 
 
