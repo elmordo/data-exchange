@@ -12,7 +12,7 @@ import { ErrorReport } from "./errors"
  *     cross field validation, etc
  * @type {Object}
  */
-export abstract class AbstractSchema implements SchemaInterface
+export abstract class AbstractSchema<Type=any> implements SchemaInterface<Type>
 {
     /**
      * list of fields
@@ -29,9 +29,9 @@ export abstract class AbstractSchema implements SchemaInterface
     /**
      * load data from raw JSON object, validate them and convert to the defined data format
      * @param  {Object} data raw data from source
-     * @return {any}         converted and validated data
+     * @return {Type}         converted and validated data
      */
-    load(data: Object): any
+    load(data: Object): Type
     {
         this.reset();
         let result = this.createObject();
@@ -51,10 +51,10 @@ export abstract class AbstractSchema implements SchemaInterface
 
     /**
      * validate data and convert them to the raw JSON object
-     * @param  {any}    data data to be dumped
+     * @param  {Type}    data data to be dumped
      * @return {Object}      raw JSON object
      */
-    dump(data: any): Object
+    dump(data: Type): Object
     {
         this.reset();
         let result = {};
@@ -110,11 +110,11 @@ export abstract class AbstractSchema implements SchemaInterface
 
     /**
      * create an output object instance
-     * @return {Object} Any object
+     * @return {Type} Any object
      */
-    createObject(): Object
+    createObject(): Type
     {
-        return {};
+        return {} as Type;
     }
 
     /**

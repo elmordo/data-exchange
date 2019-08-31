@@ -1,6 +1,6 @@
-export interface SchemaInterface {
-    load(data: Object): any;
-    dump(data: any): Object;
+export interface SchemaInterface<Type = any> {
+    load(data: Object): Type;
+    dump(data: Type): Object;
 }
 export interface FieldInterface {
     name: string;

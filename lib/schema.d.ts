@@ -1,14 +1,14 @@
 import { SchemaInterface, FieldInterface } from "./interfaces";
 import { ErrorReport } from "./errors";
-export declare abstract class AbstractSchema implements SchemaInterface {
+export declare abstract class AbstractSchema<Type = any> implements SchemaInterface<Type> {
     protected fields: FieldInterface[];
     private errors;
-    load(data: Object): any;
-    dump(data: any): Object;
+    load(data: Object): Type;
+    dump(data: Type): Object;
     reset(): void;
     hasErrors(): boolean;
     getErrors(): ErrorReport[];
     createFields(): FieldInterface[];
-    createObject(): Object;
+    createObject(): Type;
     private getFields;
 }
