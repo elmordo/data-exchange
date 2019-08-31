@@ -12,8 +12,8 @@ export declare abstract class Base implements FieldInterface {
     loadName: string;
     loadOnly: boolean;
     constructor(name: string, options?: BaseOptions);
-    abstract dump(val: any): any;
-    abstract load(val: any): any;
+    abstract dump(val: any, context?: any, result?: any, schema?: SchemaInterface): any;
+    abstract load(val: any, context?: any, result?: any, schema?: SchemaInterface): any;
     protected prepareOptions<OptionsType>(options?: OptionsType): OptionsType;
 }
 interface AbstractFieldOptions extends BaseOptions {
@@ -103,7 +103,7 @@ export declare class DateTime extends DateBase<ParsedDateTime> {
 }
 export declare abstract class ComplexFieldBase extends AbstractField {
 }
-export declare class NestedSchema extends ComplexFieldBase {
+export declare class Nested extends ComplexFieldBase {
     schema: SchemaInterface;
     constructor(name: string, schema: SchemaInterface, options?: AbstractFieldOptions);
     dump(val: any): Object;
