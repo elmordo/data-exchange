@@ -97,7 +97,7 @@ export interface ErrorReportInterface
 
     readonly data: any;
 
-    readonly schema: SchemaInterface)
+    readonly schema: SchemaInterface;
 }
 
 

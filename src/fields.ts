@@ -53,13 +53,13 @@ interface BaseOptions
      * if list of filters is given, the order of filters is for an input and reverse list of filters
      * is used for an output
      */
-    filters: FilterSettings|FilterInterface[];
+    filters?: FilterSettings|FilterInterface[];
 
     /**
      * validator settings
      * if list of validators is given, same list is used for input and output
      */
-    validators: ValidatorSettings|ValidatorInterface[];
+    validators?: ValidatorSettings|ValidatorInterface[];
 }
 
 
@@ -96,6 +96,18 @@ export abstract class Base implements FieldInterface
     loadOnly: boolean = false;
 
     /**
+     * set of validators
+     * @type {ValidatorSettings}
+     */
+    validators: ValidatorSettings;
+
+    /**
+     * set of filters
+     * @type {FilterSettings}
+     */
+    filters: FilterSettings;
+
+    /**
      * create and initialize instance
      * @param {string}      name    name of the field
      * @param {BaseOptions} options options
@@ -112,6 +124,9 @@ export abstract class Base implements FieldInterface
 
         if (options.dumpOnly !== undefined) this.dumpOnly = options.dumpOnly;
         if (options.loadOnly !== undefined) this.loadOnly = options.loadOnly;
+
+        this.filters = this.createFilterSettings(options);
+        this.validators = this.createValidatorSettings(options);
     }
 
     /**
@@ -140,6 +155,44 @@ export abstract class Base implements FieldInterface
     protected prepareOptions<OptionsType>(options?: OptionsType): OptionsType
     {
         return options ? options : {} as any;
+    }
+
+    protected applyFilters(val: any, filters: FilterInterface[]): any
+    {
+        return filters.reduce((v, f) => f.filter(v), val);
+    }
+
+    protected applyValidators(
+        val: any, context: any, result: any, schema: SchemaInterface,
+        validators: ValidatorInterface[]): void
+    {
+        let isValid = validators.reduce(
+            (valid, f) => valid && f.validate(val, context, result, schema), true);
+
+        if (!isValid)
+            throw new Error("Invalid value '" + val.toString() + "' in field '" + this.name + "'");
+    }
+
+    private createFilterSettings(options: BaseOptions): FilterSettings
+    {
+        let filters = options.filters;
+        if (!filters) return {inFilters: [], outFilters: []};
+
+        if (filters instanceof Array)
+            return {inFilters: filters, outFilters: filters.slice().reverse()}
+        else
+            return filters;
+    }
+
+    private createValidatorSettings(options: BaseOptions): ValidatorSettings
+    {
+        let validators = options.validators;
+        if (!validators) return {inValidators: [], outValidators: []};
+
+        if (validators instanceof Array)
+            return {inValidators: validators, outValidators: validators};
+        else
+            return validators;
     }
 }
 
@@ -281,10 +334,12 @@ export abstract class AbstractField extends Base
 
 export abstract class CommonBase extends AbstractField
 {
-    dump(val: any): any
+    dump(val: any, context?: any, result?: any, schema?: SchemaInterface): any
     {
         if (this.loadOnly) throw new Error("This field is load only");
+        val = this.applyFilters(val, this.filters.outFilters);
         val = this.resolveMissingAndNull(val);
+        this.applyValidators(val, context, result, schema, this.validators.outValidators);
 
         if (val !== null && val !== undefined)
             val = this.dumpValue(val);
@@ -292,10 +347,12 @@ export abstract class CommonBase extends AbstractField
         return val;
     }
 
-    load(val: any): any
+    load(val: any, context?: any, result?: any, schema?: SchemaInterface): any
     {
         if (this.dumpOnly) throw new Error("This field is dump only");
+        val = this.applyFilters(val, this.filters.inFilters);
         val = this.resolveMissingAndNull(val);
+        this.applyValidators(val, context, result, schema, this.validators.outValidators);
 
         if (val !== null && val !== undefined)
             val = this.loadValue(val);

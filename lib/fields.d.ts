@@ -1,9 +1,19 @@
-import { FieldInterface, SchemaInterface } from "./interfaces";
+import { FieldInterface, SchemaInterface, FilterInterface, ValidatorInterface } from "./interfaces";
+interface FilterSettings {
+    inFilters: FilterInterface[];
+    outFilters: FilterInterface[];
+}
+interface ValidatorSettings {
+    inValidators: ValidatorInterface[];
+    outValidators: ValidatorInterface[];
+}
 interface BaseOptions {
     dumpName?: string;
     dumpOnly?: boolean;
     loadName?: string;
     loadOnly?: boolean;
+    filters?: FilterSettings | FilterInterface[];
+    validators?: ValidatorSettings | ValidatorInterface[];
 }
 export declare abstract class Base implements FieldInterface {
     name: string;
@@ -11,10 +21,16 @@ export declare abstract class Base implements FieldInterface {
     dumpOnly: boolean;
     loadName: string;
     loadOnly: boolean;
+    validators: ValidatorSettings;
+    filters: FilterSettings;
     constructor(name: string, options?: BaseOptions);
     abstract dump(val: any, context?: any, result?: any, schema?: SchemaInterface): any;
     abstract load(val: any, context?: any, result?: any, schema?: SchemaInterface): any;
     protected prepareOptions<OptionsType>(options?: OptionsType): OptionsType;
+    protected applyFilters(val: any, filters: FilterInterface[]): any;
+    protected applyValidators(val: any, context: any, result: any, schema: SchemaInterface, validators: ValidatorInterface[]): void;
+    private createFilterSettings;
+    private createValidatorSettings;
 }
 interface AbstractFieldOptions extends BaseOptions {
     required?: boolean;
@@ -31,8 +47,8 @@ export declare abstract class AbstractField extends Base {
     protected resolveIsNull(val: any): any;
 }
 export declare abstract class CommonBase extends AbstractField {
-    dump(val: any): any;
-    load(val: any): any;
+    dump(val: any, context?: any, result?: any, schema?: SchemaInterface): any;
+    load(val: any, context?: any, result?: any, schema?: SchemaInterface): any;
     abstract dumpValue(val: any): any;
     abstract loadValue(val: any): any;
 }

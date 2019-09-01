@@ -11,3 +11,18 @@ export interface FieldInterface {
     dump(val: any, context?: any, result?: any, schema?: SchemaInterface): any;
     load(val: any, context?: any, result?: any, schema?: SchemaInterface): any;
 }
+export interface ErrorReportInterface {
+    readonly reason: string;
+    readonly code: number;
+    readonly type: string;
+    readonly field: FieldInterface;
+    readonly data: any;
+    readonly schema: SchemaInterface;
+}
+export interface FilterInterface {
+    filter(val: any): any;
+}
+export interface ValidatorInterface {
+    validate(val: any, context?: any, result?: any, schema?: SchemaInterface): boolean;
+    getLastErrors(): ErrorReportInterface[];
+}

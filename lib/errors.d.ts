@@ -1,5 +1,5 @@
-import { SchemaInterface, FieldInterface } from "./interfaces";
-export declare class ErrorReport {
+import { SchemaInterface, FieldInterface, ErrorReportInterface } from "./interfaces";
+export declare class ErrorReport implements ErrorReportInterface {
     readonly reason: string;
     readonly code: number;
     readonly type: string;
