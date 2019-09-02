@@ -332,8 +332,22 @@ export abstract class AbstractField extends Base
 }
 
 
+/**
+ * base class for common primitive types
+ * provide common load and dump logic (validators, filters, ...) and define abstract methods
+ * for parsing and exporting data.
+ * @type {Object}
+ */
 export abstract class CommonBase extends AbstractField
 {
+    /**
+     * dump value to raw JSON object
+     * @param  {any}             val     value to be dumped
+     * @param  {any}             context data context (dump source object)
+     * @param  {any}             result  actual result data
+     * @param  {SchemaInterface} schema  schema where field is processed
+     * @return {any}                     dumped value
+     */
     dump(val: any, context?: any, result?: any, schema?: SchemaInterface): any
     {
         if (this.loadOnly) throw new Error("This field is load only");
@@ -347,6 +361,14 @@ export abstract class CommonBase extends AbstractField
         return val;
     }
 
+    /**
+     * load value from raw JSON object
+     * @param  {any}             val     value to be loaded
+     * @param  {any}             context data context (load source object)
+     * @param  {any}             result  actual result data
+     * @param  {SchemaInterface} schema  schema where field is processed
+     * @return {any}                     dumped value
+     */
     load(val: any, context?: any, result?: any, schema?: SchemaInterface): any
     {
         if (this.dumpOnly) throw new Error("This field is dump only");
@@ -360,19 +382,43 @@ export abstract class CommonBase extends AbstractField
         return val;
     }
 
+    /**
+     * convert value to dump version of value
+     * @param  {any} val value to be dumped
+     * @return {any}     dumped value
+     */
     abstract dumpValue(val: any): any;
 
+    /**
+     * parse value
+     * @param  {any} val value to be parsed
+     * @return {any}     parsed data
+     */
     abstract loadValue(val: any): any;
 }
 
 
+/**
+ * field containing string
+ * @type {Object}
+ */
 export class Str extends CommonBase
 {
+    /**
+     * save value as string
+     * @param  {any}    val value to be dumped
+     * @return {string}     string representation of the value
+     */
     dumpValue(val: any): string
     {
         return val.toString();
     }
 
+    /**
+     * return value as string
+     * @param  {any}    val value to be converted to string
+     * @return {string}     string representation of the value
+     */
     loadValue(val: any): string
     {
         return val.toString();
@@ -380,8 +426,17 @@ export class Str extends CommonBase
 }
 
 
+/**
+ * common numeric field
+ * @type {Object}
+ */
 export class Numeric extends CommonBase
 {
+    /**
+     * try to convert value to number
+     * @param  {any}    val value to be converted
+     * @return {Number}     number
+     */
     dumpValue(val: any): Number
     {
         let result = Number(val);
@@ -392,6 +447,11 @@ export class Numeric extends CommonBase
         return result;
     }
 
+    /**
+     * load number from given value
+     * @param  {any}    val value to be converted
+     * @return {Number}     number
+     */
     loadValue(val: any): Number
     {
         let result = Number(val);
@@ -404,13 +464,27 @@ export class Numeric extends CommonBase
 }
 
 
+/**
+ * integer field
+ * @type {Object}
+ */
 export class Int extends Numeric
 {
+    /**
+     * dump value as integer number
+     * @param  {number} val number to be dumped
+     * @return {number}     dumped value
+     */
     dumpValue(val: number): number
     {
-        return val;
+        return Math.floor(val);
     }
 
+    /**
+     * load value as integer number
+     * @param  {any}    val value to be loaded
+     * @return {Number}     loaded value
+     */
     loadValue(val: any): Number
     {
         let result = Number(val);
@@ -423,30 +497,65 @@ export class Int extends Numeric
 }
 
 
+/**
+ * logic value (true or false)
+ * @type {Object}
+ */
 export class Bool extends CommonBase
 {
-    dumpValue(val)
+    /**
+     * dump value as boolean
+     * @param {any} val value to be converted to boolean
+     * @returns {boolean} value converted to boolean
+     */
+    dumpValue(val: any): boolean
     {
         return !!val;
     }
 
-    loadValue(val)
+    /**
+     * load value as boolean
+     * @param {any} val value to be converted to boolean
+     * @returns {boolean} value converted to boolean
+     */
+    loadValue(val: any): boolean
     {
         return !!val;
     }
 }
 
 
+/**
+ * options for fields derived from Date
+ * @type {Object}
+ */
 interface DateBaseOptions extends AbstractFieldOptions
 {
+    /**
+     * if true (default), UTC version of Date methods is used
+     * @type {boolean}
+     */
     useUTC?: boolean;
 }
 
 
+/**
+ * Base class for date fields
+ * @type {Object}
+ */
 export abstract class DateBase<ParsedDataType> extends CommonBase
 {
+    /**
+     * if true (default), UTC version of Date methods is used
+     * @type {boolean}
+     */
     useUTC: boolean = true;
 
+    /**
+     * initialize instance
+     * @param {string}          name    name of the field
+     * @param {DateBaseOptions} options options
+     */
     constructor(name: string, options?: DateBaseOptions)
     {
         super(name, options);
@@ -455,6 +564,11 @@ export abstract class DateBase<ParsedDataType> extends CommonBase
         if (options.useUTC !== undefined) this.useUTC = options.useUTC;
     }
 
+    /**
+     * load value from string
+     * @param  {string} val value to be parsed
+     * @return {Date}       Date object with parsed data
+     */
     loadValue(val: string): Date
     {
         let result = new Date();
@@ -463,6 +577,11 @@ export abstract class DateBase<ParsedDataType> extends CommonBase
         return result;
     }
 
+    /**
+     * parse data from string
+     * @param  {string}         val data to be parsed
+     * @return {ParsedDataType}     information about parsed data
+     */
     protected parseData(val: string): ParsedDataType
     {
         let pattern = this.getPattern();
@@ -474,34 +593,79 @@ export abstract class DateBase<ParsedDataType> extends CommonBase
         return this.processParsedData(result);
     }
 
+    /**
+     * process string parts from input to parsed data
+     * @param  {string[]}       data strings parsed by RegExp pattern
+     * @return {ParsedDataType}      parsed data for evaluation
+     */
     protected abstract processParsedData(data: string[]): ParsedDataType;
 
+    /**
+     * apply parsed data to target Date object
+     * @param {ParsedDataType} parsedData parsed data
+     * @param {Date}           targetDate target Date object where parsed data is applied to
+     */
     protected abstract applyParsedData(parsedData: ParsedDataType, targetDate: Date);
 
+    /**
+     * get RegExp pattern for input parsing
+     * @return {RegExp} pattern
+     */
     protected abstract getPattern(): RegExp;
 }
 
 
+/**
+ * hold information about date
+ * @type {Object}
+ */
 interface ParsedDate
 {
+    /**
+     * year
+     * @type {number}
+     */
     year: number;
 
+    /**
+     * one based month index
+     * @type {number}
+     */
     month: number;
 
+    /**
+     * date in month
+     * @type {number}
+     */
     day: number;
 }
 
 
+/**
+ * date field
+ * @type {Object}
+ * @param {ParsedDate}        type of data info parsed from input string
+ */
 export class Date_ extends DateBase<ParsedDate>
 {
     static PARSE_PATTERN_STR = "([0-9]{4})-([0-9]{2})-([0-9]{2})"
     static PARSE_PATTERN = new RegExp("^" + Date_.PARSE_PATTERN_STR + "$")
 
+    /**
+     * convert date to ISO date string
+     * @param  {Date}   val date to be dumped
+     * @return {string}     string representation of date
+     */
     dumpValue(val: Date): string
     {
         return val.toISOString().split("T")[0];
     }
 
+    /**
+     * process string parts from input to parsed data
+     * @param  {string[]}       data strings parsed by RegExp pattern
+     * @return {ParsedDataType}      parsed data for evaluation
+     */
     protected processParsedData(data: string[]): ParsedDate
     {
         return {
@@ -511,11 +675,20 @@ export class Date_ extends DateBase<ParsedDate>
         }
     }
 
+    /**
+     * get RegExp pattern for input parsing
+     * @return {RegExp} pattern
+     */
     protected getPattern(): RegExp
     {
         return Date_.PARSE_PATTERN;
     }
 
+    /**
+     * apply parsed data to target Date object
+     * @param {ParsedDataType} parsedData parsed data
+     * @param {Date}           targetDate target Date object where parsed data is applied to
+     */
     protected applyParsedData(data: ParsedDate, target: Date): void
     {
         if (this.useUTC)
@@ -534,18 +707,42 @@ export class Date_ extends DateBase<ParsedDate>
 }
 
 
+/**
+ * ïnformation about time parsed from input string
+ * @type {Object}
+ */
 interface ParsedTime
 {
+    /**
+     * hour
+     * @type {number}
+     */
     hour: number;
 
+    /**
+     * minute
+     * @type {number}
+     */
     minute: number;
 
+    /**
+     * second
+     * @type {number}
+     */
     second: number;
 
+    /**
+     * millisecond
+     * @type {number}
+     */
     millisecond: number;
 }
 
 
+/**
+ * time field
+ * @type {Object}
+ */
 export class Time extends DateBase<ParsedTime>
 {
     /**
@@ -563,11 +760,21 @@ export class Time extends DateBase<ParsedTime>
     static PARSE_PATTERN_STR = "([0-9]{2}):([0-9]{2})(:([0-9]{2})(\.([0-9]{1,3}))?)?(Z|([\+\-])([0-9]{2}):([0-9]{2}))?"
     static PARSE_PATTERN = new RegExp("^" + Time.PARSE_PATTERN_STR + "$");
 
+    /**
+     * return time part of ISO date string
+     * @param  {Date}   val date to be saved
+     * @return {string}     time part of ISO date string
+     */
     dumpValue(val: Date): string
     {
         return val.toISOString().split("T")[1];
     }
 
+    /**
+     * process string parts from input to parsed data
+     * @param  {string[]}       data strings parsed by RegExp pattern
+     * @return {ParsedDataType}      parsed data for evaluation
+     */
     protected processParsedData(data: string[]): ParsedTime
     {
         if (data[4] === undefined)
@@ -584,6 +791,11 @@ export class Time extends DateBase<ParsedTime>
         }
     }
 
+    /**
+     * apply parsed data to target Date object
+     * @param {ParsedDataType} parsedData parsed data
+     * @param {Date}           targetDate target Date object where parsed data is applied to
+     */
     protected applyParsedData(parsedData: ParsedTime, targetDate: Date)
     {
         if (this.useUTC)
@@ -598,6 +810,10 @@ export class Time extends DateBase<ParsedTime>
         }
     }
 
+    /**
+     * get RegExp pattern for input parsing
+     * @return {RegExp} pattern
+     */
     protected getPattern(): RegExp
     {
         return Time.PARSE_PATTERN;
@@ -605,26 +821,48 @@ export class Time extends DateBase<ParsedTime>
 }
 
 
+/**
+ * parsed data of date and time
+ * @type {Object}
+ */
 interface ParsedDateTime extends ParsedDate, ParsedTime
 {
 }
 
 
+/**
+ * date field
+ * @type {Object}
+ */
 export class DateTime extends DateBase<ParsedDateTime>
 {
     static PARSE_PATTERN_STR = Date_.PARSE_PATTERN_STR + "T" + Time.PARSE_PATTERN_STR;
     static PARSE_PATTERN = new RegExp("^" + DateTime.PARSE_PATTERN_STR + "$")
 
+    /**
+     * get full iso format of Date
+     * @param  {Date}   val date to be dumped
+     * @return {string}     ISO format of date
+     */
     dumpValue(val: Date): string
     {
         return val.toISOString();
     }
 
+    /**
+     * get RegExp pattern for input parsing
+     * @return {RegExp} pattern
+     */
     protected getPattern()
     {
         return DateTime.PARSE_PATTERN;
     }
 
+    /**
+     * process string parts from input to parsed data
+     * @param  {string[]}       data strings parsed by RegExp pattern
+     * @return {ParsedDataType}      parsed data for evaluation
+     */
     protected processParsedData(data: string[]): ParsedDateTime
     {
         return {
@@ -638,6 +876,11 @@ export class DateTime extends DateBase<ParsedDateTime>
         };
     }
 
+    /**
+     * apply parsed data to target Date object
+     * @param {ParsedDataType} parsedData parsed data
+     * @param {Date}           targetDate target Date object where parsed data is applied to
+     */
     protected applyParsedData(data: ParsedDateTime, date: Date): void
     {
         if (this.useUTC)
@@ -660,15 +903,34 @@ export class DateTime extends DateBase<ParsedDateTime>
 }
 
 
+/**
+ * base class for complex fields
+ * This class is empty at this time
+ * @type {Object}
+ */
 export abstract class ComplexFieldBase extends AbstractField
 {
 }
 
 
+/**
+ * provide schema nesting
+ * @type {Object}
+ */
 export class Nested extends ComplexFieldBase
 {
+    /**
+     * nested schema type
+     * @type {SchemaInterface}
+     */
     schema: SchemaInterface;
 
+    /**
+     * initialize instance
+     * @param {string}               name    name of the field
+     * @param {SchemaInterface}      schema  nested schema type
+     * @param {AbstractFieldOptions} options additional options
+     */
     constructor(name: string, schema: SchemaInterface, options?: AbstractFieldOptions)
     {
         super(name, options);
@@ -676,6 +938,11 @@ export class Nested extends ComplexFieldBase
         this.schema = schema;
     }
 
+    /**
+     * dump value by applying the schema
+     * @param  {any}    val value (object) to be dumped
+     * @return {Object}     dumped data
+     */
     dump(val: any): Object
     {
         this.resolveMissingAndNull(val);
@@ -683,6 +950,11 @@ export class Nested extends ComplexFieldBase
         return this.schema.dump(val);
     }
 
+    /**
+     * load value by applying the schema
+     * @param  {Object} val value (object) to be loaded
+     * @return {any}        [description]
+     */
     load(val: Object): any
     {
         this.resolveMissingAndNull(val);
@@ -692,10 +964,24 @@ export class Nested extends ComplexFieldBase
 }
 
 
+/**
+ * provide support of item lists
+ * @type {Object}
+ */
 export class List extends ComplexFieldBase
 {
+    /**
+     * item type field
+     * @type {FieldInterface}
+     */
     itemField: FieldInterface;
 
+    /**
+     * initialize instance
+     * @param {string}               name      name of the field
+     * @param {FieldInterface}       itemField field prototype
+     * @param {AbstractFieldOptions} options   additioanl options
+     */
     constructor(name: string, itemField: FieldInterface, options?: AbstractFieldOptions)
     {
         super(name, options);
@@ -703,6 +989,11 @@ export class List extends ComplexFieldBase
         this.itemField = itemField;
     }
 
+    /**
+     * load sequence of items
+     * @param  {Object[]} val input list
+     * @return {any[]}        list of parsed data
+     */
     load(val: Object[]): any[]
     {
         this.resolveMissingAndNull(val);
@@ -710,6 +1001,11 @@ export class List extends ComplexFieldBase
         return val.map(x => this.itemField.load(x));
     }
 
+    /**
+     * dump sequence of items
+     * @param  {any[]}    val list of items
+     * @return {Object[]}     list of dumped data
+     */
     dump(val: any[]): Object[]
     {
         this.resolveMissingAndNull(val);
@@ -717,6 +1013,10 @@ export class List extends ComplexFieldBase
         return val.map(x => this.itemField.dump(x));
     }
 
+    /**
+     * prepare value
+     * @param {any} val value to be prepared
+     */
     protected resolveMissingAndNull(val: any): void
     {
         super.resolveMissingAndNull(val);

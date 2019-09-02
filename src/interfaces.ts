@@ -86,17 +86,40 @@ export interface FieldInterface
  */
 export interface ErrorReportInterface
 {
-
+    /**
+     * error reason
+     * @type {string}
+     */
     readonly reason: string;
 
+    /**
+     * error code
+     * @type {number}
+     */
     readonly code: number;
 
+    /**
+     * error type
+     * @type {string}
+     */
     readonly type: string;
 
+    /**
+     * source field
+     * @type {FieldInterface}
+     */
     readonly field: FieldInterface;
 
+    /**
+     * error data
+     * @type {any}
+     */
     readonly data: any;
 
+    /**
+     * source schema
+     * @type {SchemaInterface}
+     */
     readonly schema: SchemaInterface;
 }
 
