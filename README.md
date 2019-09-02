@@ -66,4 +66,47 @@ Fields support validation and filtration of values. There is no validators or fi
 Examples
 --------
 
-See the `samples` directory.
+Sample schema definition
+
+```TypeScript
+import { AbstractSchema, Int, Str, Date_, Nested, List } from "data-exchange"
+
+
+class Ban
+{
+    reason: string;
+
+    banned_at: Date;
+}
+
+
+class BanSchema extends AbstractSchema<Ban>
+{
+    createFields()
+    {
+        return [
+            new Str("reason", {required: true}),
+            new Date_("banned_at", {required: true})
+        ]
+    }
+
+    createObject(): Ban
+    {
+        return new Ban();
+    }
+}
+
+
+class UserSchema extends AbstractSchema
+{
+    fields = [
+        new Int("id", {loadOnly: true, loadName: "id_user", required: true}),
+        new Str("name", {required: true}),      // field cannot be undefined or NULL
+        new DateTime("created_at", {required: true, nullable: false}), // field cannot be undefined, but NULL is OK
+        new List("favorite_numbers", new Int(null, {required: true})),
+        new Nested("last_ban", new BanSchema(), {required: true, nullable: false})
+    ]
+}
+```
+
+For more information see docstrings in code or examples in "sample" directory.
