@@ -27,17 +27,17 @@ Fields
 There are few types of fields delivered with the library.
 
 * Primitive fields
-** `Str` - strings
-** `Numeric` - all numeric values
-** `Int` - integer subset of numeric values (if value is float, it is rouned)
-** `Bool` - logic value
+  * `Str` - strings
+  * `Numeric` - all numeric values
+  * `Int` - integer subset of numeric values (if value is float, it is rouned)
+  * `Bool` - logic value
 * Date fields - fields with date and time values
-** `Date_` - only date (field class has underscore suffix to avoid name conflict with JS built-on Date type)
-** `Time` - only time
-** `DateTime` - both date and time
+  * `Date_` - only date (field class has underscore suffix to avoid name conflict with JS built-on Date type)
+  * `Time` - only time
+  * `DateTime` - both date and time
 * Complex fields - fields containing fields
-** `Nested` - nested schema
-** `List` - list of items with same type.
+  * `Nested` - nested schema
+  * `List` - list of items with same type.
 
 Common fields constructor interface is
 
