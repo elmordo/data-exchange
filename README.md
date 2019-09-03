@@ -47,6 +47,9 @@ Common fields constructor interface is
 
 Settings values common for all built-in fields are:
 
+* `required` - true if value cannot be undefined
+* `nullable` - true if value can be null
+* `defaultValue` - default value if value is undefined
 * `dumpName` - name of attribute in dumped object (default is `name`)
 * `loadName` - name of attribute in loaded object (default is `name`)
 * `dumpOnly` - if true, field will not be loaded
@@ -107,6 +110,25 @@ class UserSchema extends AbstractSchema
         new Nested("last_ban", new BanSchema(), {required: true, nullable: false})
     ]
 }
+
+
+let data = {
+    id_user: 1,
+    name: "Karel Novak",
+    created_at: "2019-09-03T07:01:30.073Z",
+    favorite_numbers: [1, 13, 69],
+    last_ban: {
+        reason: "multiple accounts",
+        bannted_at: "2019-09-03T07:01:30.073Z"
+    }
+}
+
+
+let schema = new UserSchema();
+let item = schema.load(data);
+
+let dumpedData = schema.dump(item);
+
 ```
 
 For more information see docstrings in code or examples in "sample" directory.
