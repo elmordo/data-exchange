@@ -132,3 +132,6 @@ let dumpedData = schema.dump(item);
 ```
 
 For more information see docstrings in code or examples in "sample" directory.
+
+The `load` method has the second optional argument. It is target object where data is load into. If no
+object is given, new empty object (by `createObject()` call) is created.

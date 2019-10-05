@@ -29,12 +29,13 @@ export abstract class AbstractSchema<Type=any> implements SchemaInterface<Type>
     /**
      * load data from raw JSON object, validate them and convert to the defined data format
      * @param  {Object} data raw data from source
+     * @param  {Type}   target target object to load data into
      * @return {Type}         converted and validated data
      */
-    load(data: Object): Type
+    load(data: Object, target?: Type): Type
     {
         this.reset();
-        let result = this.createObject();
+        let result = target ? target : this.createObject();
         let fields = this.getFields();
 
         fields.forEach(f =>
@@ -123,7 +124,7 @@ export abstract class AbstractSchema<Type=any> implements SchemaInterface<Type>
      *
      * @return {FieldInterface[]} list of fields
      */
-    private getFields(): FieldInterface[]
+    getFields(): FieldInterface[]
     {
         if (this.fields === undefined)
             this.fields = this.createFields();

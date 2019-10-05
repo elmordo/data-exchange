@@ -8,10 +8,12 @@ export interface SchemaInterface<Type=any>
 {
     /**
      * load data from raw JSON object, validate them and convert to the defined data format
+     * if no target object is given, new object is created
      * @param  {Object} data raw data from source
+     * @param  {Type}   target target object to load data into
      * @return {Type}         converted and validated data
      */
-    load(data: Object): Type;
+    load(data: Object, target?: Type): Type;
 
     /**
      * validate data and convert them to the raw JSON object
