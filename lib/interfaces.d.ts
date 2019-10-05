@@ -1,5 +1,5 @@
 export interface SchemaInterface<Type = any> {
-    load(data: Object): Type;
+    load(data: Object, target?: Type): Type;
     dump(data: Type): Object;
 }
 export interface FieldInterface {
