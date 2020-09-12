@@ -757,7 +757,7 @@ export class Time extends DateBase<ParsedTime>
      * - +/-HH:MM
      * @type {RegExp}
      */
-    static PARSE_PATTERN_STR = "([0-9]{2}):([0-9]{2})(:([0-9]{2})(\.([0-9]{1,3}))?)?(Z|([\+\-])([0-9]{2}):([0-9]{2}))?"
+    static PARSE_PATTERN_STR = "([0-9]{2}):([0-9]{2})(:([0-9]{2})(\.([0-9]+))?)?(Z|([\+\-])([0-9]{2}):([0-9]{2}))?"
     static PARSE_PATTERN = new RegExp("^" + Time.PARSE_PATTERN_STR + "$");
 
     /**
