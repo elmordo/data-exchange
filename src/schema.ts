@@ -42,9 +42,9 @@ export abstract class AbstractSchema<Type=any> implements SchemaInterface<Type>
         {
             if (f.dumpOnly) return;
 
-            let name = f.localName;
+            let name = f.remoteName;
             let val = f.load(data[name], data, result, this);
-            result[f.remoteName] = val;
+            result[f.localName] = val;
         });
 
         return result;
@@ -65,9 +65,9 @@ export abstract class AbstractSchema<Type=any> implements SchemaInterface<Type>
         {
             if (f.loadOnly) return;
 
-            let name = f.remoteName;
+            let name = f.localName;
             let val = f.dump(data[name], data, result, this);
-            result[f.localName] = val;
+            result[f.remoteName] = val;
         });
 
         return result;

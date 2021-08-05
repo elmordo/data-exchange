@@ -89,7 +89,7 @@ export abstract class Base implements FieldInterface
      * name of the attribute where data will be dumped
      * @type {string}
      */
-    localName: string;
+    remoteName: string;
 
     /**
      * true if field is only dumped (it is skipped on load)
@@ -101,7 +101,7 @@ export abstract class Base implements FieldInterface
      * name of the attribute where data will be loaded from
      * @type {string}
      */
-    remoteName: string;
+    localName: string;
 
     /**
      * true if attributed is load only (it is skipped on dump)
@@ -129,12 +129,12 @@ export abstract class Base implements FieldInterface
     constructor(name: string, options?: BaseOptions)
     {
         options = this.prepareOptions(options);
-        if (!options.dumpName) options.dumpName = name;
-        if (!options.loadName) options.loadName = name;
+        if (!options.localName) options.localName = name;
+        if (!options.remoteName) options.remoteName = name;
 
         this.name = name;
-        this.localName = options.dumpName;
-        this.remoteName = options.loadName;
+        this.localName = options.localName;
+        this.remoteName = options.remoteName;
 
         if (options.dumpOnly !== undefined) this.dumpOnly = options.dumpOnly;
         if (options.loadOnly !== undefined) this.loadOnly = options.loadOnly;
