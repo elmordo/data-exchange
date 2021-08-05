@@ -25,17 +25,17 @@ interface ValidatorSettings
 interface BaseOptions
 {
     /**
-     * name of the attribute where data will be dumped
+     * legacy name for the `localName` field
      * @type {string}
      * @deprecated
      */
     dumpName?: string;
 
     /**
-     * name of the attribute in the remote object
+     * name of the attribute in the local object
      * @type {string}
      */
-    remoteName?: string;
+    localName?: string;
 
     /**
      * true if field is only dumped (it is skipped on load)
@@ -51,10 +51,10 @@ interface BaseOptions
     loadName?: string;
 
     /**
-     * name of the attribute in the local object
+     * legacy name for the `remoteName` field
      * @type {string}
      */
-    localName?: string;
+    remoteName?: string;
 
     /**
      * true if attributed is load only (it is skipped on dump)
@@ -89,7 +89,7 @@ export abstract class Base implements FieldInterface
      * name of the attribute where data will be dumped
      * @type {string}
      */
-    dumpName: string;
+    localName: string;
 
     /**
      * true if field is only dumped (it is skipped on load)
@@ -101,7 +101,7 @@ export abstract class Base implements FieldInterface
      * name of the attribute where data will be loaded from
      * @type {string}
      */
-    loadName: string;
+    remoteName: string;
 
     /**
      * true if attributed is load only (it is skipped on dump)
@@ -133,8 +133,8 @@ export abstract class Base implements FieldInterface
         if (!options.loadName) options.loadName = name;
 
         this.name = name;
-        this.dumpName = options.dumpName;
-        this.loadName = options.loadName;
+        this.localName = options.dumpName;
+        this.remoteName = options.loadName;
 
         if (options.dumpOnly !== undefined) this.dumpOnly = options.dumpOnly;
         if (options.loadOnly !== undefined) this.loadOnly = options.loadOnly;

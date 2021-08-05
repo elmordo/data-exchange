@@ -37,10 +37,10 @@ export interface FieldInterface
     name: string;
 
     /**
-     * name of the attribute where data will be dumped
+     * name of the attribute in a local object
      * @type {string}
      */
-    dumpName: string;
+    localName: string;
 
     /**
      * true if field is only dumped (it is skipped on load)
@@ -49,10 +49,10 @@ export interface FieldInterface
     dumpOnly: boolean;
 
     /**
-     * name of the attribute where data will be loaded from
+     * name of the attribute in a remote object
      * @type {string}
      */
-    loadName: string;
+    remoteName: string;
 
     /**
      * true if attributed is load only (it is skipped on dump)
