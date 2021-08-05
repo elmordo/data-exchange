@@ -6,8 +6,10 @@ The main purpose of the library is to process data from transport format (e.g. s
 Main features
 -------------
 
-* simple to use
-* nesting schemas
+* easy to use
+* dumping data (convert local objects to remote ones)
+* loading data (convert remote objects to local ones)
+* nested schemas
 * custom filters
 * custom validation
 
