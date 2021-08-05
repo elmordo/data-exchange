@@ -50,12 +50,14 @@ Settings values common for all built-in fields are:
 * `required` - true if value cannot be undefined
 * `nullable` - true if value can be null
 * `defaultValue` - default value if value is undefined
-* `dumpName` - name of attribute in dumped object (default is `name`)
-* `loadName` - name of attribute in loaded object (default is `name`)
+* `localName` - name of attribute in local object (default is `name`)
+* `remoteName` - name of attribute in remote object (default is `name`)
 * `dumpOnly` - if true, field will not be loaded
 * `loadOnly` - if true, field will not be dumped
 * `filters` - list of filters
 * `validators` - list of validators
+* `dumpName` - **DEPRECATED** legacy alias for the `localName`
+* `loadName` - **DEPRECATED** legacy alias for the `remoteName`
 
 For Date like fields:
 
@@ -103,7 +105,7 @@ class BanSchema extends AbstractSchema<Ban>
 class UserSchema extends AbstractSchema
 {
     fields = [
-        new Int("id", {loadOnly: true, loadName: "id_user", required: true}),
+        new Int("id", {loadOnly: true, remoteName: "id_user", required: true}),
         new Str("name", {required: true}),      // field cannot be undefined or NULL
         new DateTime("created_at", {required: true, nullable: false}), // field cannot be undefined, but NULL is OK
         new List("favorite_numbers", new Int(null, {required: true})),
