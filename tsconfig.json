@@ -2,7 +2,7 @@
     "compilerOptions": {
         "module": "CommonJS",
         "removeComments": true,
-        "target": "es5",
+        "target": "es2015",
         "outDir": "./lib",
     },
     "files": [
