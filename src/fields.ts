@@ -1,4 +1,5 @@
 
+import {DateTimeFormatter, IsoFormatter} from "./datetime";
 import { FieldInterface, SchemaInterface, FilterInterface, ValidatorInterface } from "./interfaces"
 
 
@@ -561,6 +562,11 @@ interface DateBaseOptions extends AbstractFieldOptions
      * @type {boolean}
      */
     useUTC?: boolean;
+
+    /**
+     * formatter for date and time (default is IsoFormatter)
+     */
+    formatter?: DateTimeFormatter
 }
 
 
@@ -577,6 +583,11 @@ export abstract class DateBase extends CommonBase
     useUTC: boolean = true;
 
     /**
+     * formatter for date and time
+     */
+    formatter: DateTimeFormatter;
+
+    /**
      * initialize instance
      * @param {string}          name    name of the field
      * @param {DateBaseOptions} options options
@@ -587,6 +598,11 @@ export abstract class DateBase extends CommonBase
         options = this.prepareOptions(options);
 
         if (options.useUTC !== undefined) this.useUTC = options.useUTC;
+        if (options.formatter !== undefined) {
+            this.formatter = options.formatter;
+        } else {
+            this.formatter = new IsoFormatter();
+        }
     }
 }
 
@@ -604,11 +620,11 @@ export class Date_ extends DateBase
      */
     dumpValue(val: Date): string
     {
-        return val.toISOString().split("T")[0];
+        return this.formatter.formatDate(val);
     }
 
     loadValue(val: string): any {
-        return new Date(val);
+        return this.formatter.parseDate(val);
     }
 }
 
@@ -626,17 +642,11 @@ export class Time extends DateBase
      */
     dumpValue(val: Date): string
     {
-        return val.toISOString().split("T")[1];
+        return this.formatter.formatTime(val);
     }
 
     loadValue(val: string): Date {
-        const today = new Date();
-        const date = today.toISOString().split("T")[0];
-        let data = `${date}T${val}`;
-        if (this.useUTC) {
-            data += "Z";
-        }
-        return new Date(data);
+        return this.formatter.parseTime(val);
     }
 }
 
@@ -654,11 +664,11 @@ export class DateTime extends DateBase
      */
     dumpValue(val: Date): string
     {
-        return val.toISOString();
+        return this.formatter.formatDateTime(val);
     }
 
     loadValue(val: any): Date {
-        return new Date(val);
+        return this.formatter.parseDateTime(val);
     }
 }
 

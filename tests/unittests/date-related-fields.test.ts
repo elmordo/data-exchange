@@ -41,7 +41,7 @@ describe("Date and time related fields", () => {
             field = new Time("time");
         });
         it("test load", () => {
-            const result: Date = field.load("12:31:10.666");
+            const result: Date = field.load("12:31:10.666Z");
             expect(result.getUTCHours()).toEqual(12)
             expect(result.getUTCMinutes()).toEqual(31)
             expect(result.getUTCSeconds()).toEqual(10)

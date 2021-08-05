@@ -1,6 +1,6 @@
 
 
-export abstract class DateTimeFormat {
+export abstract class DateTimeFormatter {
     abstract parseDate(inp: string): Date;
 
     abstract parseTime(inp: string): Date;
@@ -15,7 +15,7 @@ export abstract class DateTimeFormat {
 }
 
 
-export class IsoFormat extends DateTimeFormat {
+export class IsoFormatter extends DateTimeFormatter {
     formatDate(date: Date): string {
         return date.toISOString().split("T")[0];
     }
