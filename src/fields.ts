@@ -568,7 +568,7 @@ interface DateBaseOptions extends AbstractFieldOptions
  * Base class for date fields
  * @type {Object}
  */
-export abstract class DateBase<ParsedDataType> extends CommonBase
+export abstract class DateBase extends CommonBase
 {
     /**
      * if true (default), UTC version of Date methods is used
@@ -588,94 +588,15 @@ export abstract class DateBase<ParsedDataType> extends CommonBase
 
         if (options.useUTC !== undefined) this.useUTC = options.useUTC;
     }
-
-    /**
-     * load value from string
-     * @param  {string} val value to be parsed
-     * @return {Date}       Date object with parsed data
-     */
-    loadValue(val: string): Date
-    {
-        let result = new Date();
-        let parsedData = this.parseData(val);
-        this.applyParsedData(parsedData, result);
-        return result;
-    }
-
-    /**
-     * parse data from string
-     * @param  {string}         val data to be parsed
-     * @return {ParsedDataType}     information about parsed data
-     */
-    protected parseData(val: string): ParsedDataType
-    {
-        let pattern = this.getPattern();
-        let result = pattern.exec(val);
-
-        if (result === null)
-            throw new Error("Invalid date format in field '" + this.name + "'");
-
-        return this.processParsedData(result);
-    }
-
-    /**
-     * process string parts from input to parsed data
-     * @param  {string[]}       data strings parsed by RegExp pattern
-     * @return {ParsedDataType}      parsed data for evaluation
-     */
-    protected abstract processParsedData(data: string[]): ParsedDataType;
-
-    /**
-     * apply parsed data to target Date object
-     * @param {ParsedDataType} parsedData parsed data
-     * @param {Date}           targetDate target Date object where parsed data is applied to
-     */
-    protected abstract applyParsedData(parsedData: ParsedDataType, targetDate: Date);
-
-    /**
-     * get RegExp pattern for input parsing
-     * @return {RegExp} pattern
-     */
-    protected abstract getPattern(): RegExp;
-}
-
-
-/**
- * hold information about date
- * @type {Object}
- */
-interface ParsedDate
-{
-    /**
-     * year
-     * @type {number}
-     */
-    year: number;
-
-    /**
-     * one based month index
-     * @type {number}
-     */
-    month: number;
-
-    /**
-     * date in month
-     * @type {number}
-     */
-    day: number;
 }
 
 
 /**
  * date field
  * @type {Object}
- * @param {ParsedDate}        type of data info parsed from input string
  */
-export class Date_ extends DateBase<ParsedDate>
+export class Date_ extends DateBase
 {
-    static PARSE_PATTERN_STR = "([0-9]{4})-([0-9]{2})-([0-9]{2})"
-    static PARSE_PATTERN = new RegExp("^" + Date_.PARSE_PATTERN_STR + "$")
-
     /**
      * convert date to ISO date string
      * @param  {Date}   val date to be dumped
@@ -686,81 +607,9 @@ export class Date_ extends DateBase<ParsedDate>
         return val.toISOString().split("T")[0];
     }
 
-    /**
-     * process string parts from input to parsed data
-     * @param  {string[]}       data strings parsed by RegExp pattern
-     * @return {ParsedDataType}      parsed data for evaluation
-     */
-    protected processParsedData(data: string[]): ParsedDate
-    {
-        return {
-            year: Number(data[1]),
-            month: Number(data[2]) - 1,
-            day: Number(data[3])
-        }
+    loadValue(val: string): any {
+        return new Date(val);
     }
-
-    /**
-     * get RegExp pattern for input parsing
-     * @return {RegExp} pattern
-     */
-    protected getPattern(): RegExp
-    {
-        return Date_.PARSE_PATTERN;
-    }
-
-    /**
-     * apply parsed data to target Date object
-     * @param {ParsedDataType} parsedData parsed data
-     * @param {Date}           targetDate target Date object where parsed data is applied to
-     */
-    protected applyParsedData(data: ParsedDate, target: Date): void
-    {
-        if (this.useUTC)
-        {
-            target.setUTCFullYear(data.year);
-            target.setUTCMonth(data.month);
-            target.setUTCDate(data.day);
-        }
-        else
-        {
-            target.setFullYear(data.year);
-            target.setMonth(data.month);
-            target.setDate(data.day);
-        }
-    }
-}
-
-
-/**
- * ïnformation about time parsed from input string
- * @type {Object}
- */
-interface ParsedTime
-{
-    /**
-     * hour
-     * @type {number}
-     */
-    hour: number;
-
-    /**
-     * minute
-     * @type {number}
-     */
-    minute: number;
-
-    /**
-     * second
-     * @type {number}
-     */
-    second: number;
-
-    /**
-     * millisecond
-     * @type {number}
-     */
-    millisecond: number;
 }
 
 
@@ -768,23 +617,8 @@ interface ParsedTime
  * time field
  * @type {Object}
  */
-export class Time extends DateBase<ParsedTime>
+export class Time extends DateBase
 {
-    /**
-     * allowed patterns are:
-     * - HH:MM
-     * - HH:MM:SS
-     * - HH:MM:SS.mmm
-     *
-     * allowed timezone suffixes are:
-     * - none
-     * - Z (for UTC)
-     * - +/-HH:MM
-     * @type {RegExp}
-     */
-    static PARSE_PATTERN_STR = "([0-9]{2}):([0-9]{2})(:([0-9]{2})(\.([0-9]+))?)?(Z|([\+\-])([0-9]{2}):([0-9]{2}))?"
-    static PARSE_PATTERN = new RegExp("^" + Time.PARSE_PATTERN_STR + "$");
-
     /**
      * return time part of ISO date string
      * @param  {Date}   val date to be saved
@@ -795,63 +629,15 @@ export class Time extends DateBase<ParsedTime>
         return val.toISOString().split("T")[1];
     }
 
-    /**
-     * process string parts from input to parsed data
-     * @param  {string[]}       data strings parsed by RegExp pattern
-     * @return {ParsedDataType}      parsed data for evaluation
-     */
-    protected processParsedData(data: string[]): ParsedTime
-    {
-        if (data[4] === undefined)
-            data[4] = "0";
-
-        if (data[6] === undefined)
-            data[6] = "0";
-
-        return {
-            hour: Number(data[1]),
-            minute: Number(data[2]),
-            second: Number(data[4]),
-            millisecond: Number(data[6])
+    loadValue(val: string): Date {
+        const today = new Date();
+        const date = today.toISOString().split("T")[0];
+        let data = `${date}T${val}`;
+        if (this.useUTC) {
+            data += "Z";
         }
+        return new Date(data);
     }
-
-    /**
-     * apply parsed data to target Date object
-     * @param {ParsedDataType} parsedData parsed data
-     * @param {Date}           targetDate target Date object where parsed data is applied to
-     */
-    protected applyParsedData(parsedData: ParsedTime, targetDate: Date)
-    {
-        if (this.useUTC)
-        {
-            targetDate.setUTCHours(
-                parsedData.hour, parsedData.minute, parsedData.second, parsedData.millisecond);
-        }
-        else
-        {
-            targetDate.setHours(
-                parsedData.hour, parsedData.minute, parsedData.second, parsedData.millisecond);
-        }
-    }
-
-    /**
-     * get RegExp pattern for input parsing
-     * @return {RegExp} pattern
-     */
-    protected getPattern(): RegExp
-    {
-        return Time.PARSE_PATTERN;
-    }
-}
-
-
-/**
- * parsed data of date and time
- * @type {Object}
- */
-interface ParsedDateTime extends ParsedDate, ParsedTime
-{
 }
 
 
@@ -859,11 +645,8 @@ interface ParsedDateTime extends ParsedDate, ParsedTime
  * date field
  * @type {Object}
  */
-export class DateTime extends DateBase<ParsedDateTime>
+export class DateTime extends DateBase
 {
-    static PARSE_PATTERN_STR = Date_.PARSE_PATTERN_STR + "T" + Time.PARSE_PATTERN_STR;
-    static PARSE_PATTERN = new RegExp("^" + DateTime.PARSE_PATTERN_STR + "$")
-
     /**
      * get full iso format of Date
      * @param  {Date}   val date to be dumped
@@ -874,56 +657,8 @@ export class DateTime extends DateBase<ParsedDateTime>
         return val.toISOString();
     }
 
-    /**
-     * get RegExp pattern for input parsing
-     * @return {RegExp} pattern
-     */
-    protected getPattern()
-    {
-        return DateTime.PARSE_PATTERN;
-    }
-
-    /**
-     * process string parts from input to parsed data
-     * @param  {string[]}       data strings parsed by RegExp pattern
-     * @return {ParsedDataType}      parsed data for evaluation
-     */
-    protected processParsedData(data: string[]): ParsedDateTime
-    {
-        return {
-            year: Number(data[1]),
-            month: Number(data[2]) - 1,
-            day: Number(data[3]),
-            hour: Number(data[4]),
-            minute: Number(data[5]),
-            second: Number(data[7]),
-            millisecond: (data[9] === undefined) ? 0 : Number(data[9])
-        };
-    }
-
-    /**
-     * apply parsed data to target Date object
-     * @param {ParsedDataType} parsedData parsed data
-     * @param {Date}           targetDate target Date object where parsed data is applied to
-     */
-    protected applyParsedData(data: ParsedDateTime, date: Date): void
-    {
-        if (this.useUTC)
-        {
-            date.setUTCFullYear(data.year);
-            date.setUTCMonth(data.month);
-            date.setUTCDate(data.day);
-
-            date.setUTCHours(data.hour, data.minute, data.second, data.millisecond);
-        }
-        else
-        {
-            date.setFullYear(data.year);
-            date.setMonth(data.month);
-            date.setDate(data.day);
-
-            date.setHours(data.hour, data.minute, data.second, data.millisecond);
-        }
+    loadValue(val: any): Date {
+        return new Date(val);
     }
 }
 
