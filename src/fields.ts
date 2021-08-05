@@ -27,8 +27,15 @@ interface BaseOptions
     /**
      * name of the attribute where data will be dumped
      * @type {string}
+     * @deprecated
      */
     dumpName?: string;
+
+    /**
+     * name of the attribute in the remote object
+     * @type {string}
+     */
+    remoteName?: string;
 
     /**
      * true if field is only dumped (it is skipped on load)
@@ -39,8 +46,15 @@ interface BaseOptions
     /**
      * name of the attribute where data will be loaded from
      * @type {string}
+     * @deprecated
      */
     loadName?: string;
+
+    /**
+     * name of the attribute in the local object
+     * @type {string}
+     */
+    localName?: string;
 
     /**
      * true if attributed is load only (it is skipped on dump)
@@ -152,9 +166,20 @@ export abstract class Base implements FieldInterface
     /**
      * prepare options for use
      */
-    protected prepareOptions<OptionsType>(options?: OptionsType): OptionsType
+    protected prepareOptions<OptionsType extends BaseOptions>(options?: OptionsType): OptionsType
     {
-        return options ? options : {} as any;
+        options = options ? options : {} as any;
+
+        if ("dumpName" in options) {
+            options.localName = options.dumpName;
+            console.warn(`The 'dumpName' option key is deprecated and will be removed in next major release`);
+        }
+        if ("loadName" in options) {
+            options.remoteName = options.loadName;
+            console.warn(`The 'loadName' option key is deprecated and will be removed in next major release`);
+        }
+
+        return options;
     }
 
     protected applyFilters(val: any, filters: FilterInterface[]): any
