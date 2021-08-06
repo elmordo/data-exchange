@@ -25,7 +25,7 @@ export interface IsoFormatterOptions {
 
 export class IsoFormatter extends DateTimeFormatter {
 
-    static readonly TZ_REGEXP = /[\+\-]\d{2}:\d{2}$/;
+    static readonly TZ_REGEXP = /[+\-]\d{2}:\d{2}$/;
 
     readonly defaultTimeZone?: string|null;
 
@@ -65,29 +65,20 @@ export class IsoFormatter extends DateTimeFormatter {
     }
 
     private prepareTimeInput(inp: string): string {
-        const tz = this.getTimeZone(inp);
-        if (tz === null && this.defaultTimeZone !== null) {
+        const tz = IsoFormatter.hasTimeZone(inp);
+        if (tz === false && this.defaultTimeZone !== null) {
             inp += this.defaultTimeZone;
         }
         return inp;
     }
 
-    private getTimeZone(inp: string): number|null {
+    private static hasTimeZone(inp: string): boolean {
         let lastChar: string;
         try {
             lastChar = inp[inp.length - 1].toUpperCase();
         } catch (err) {
-            return null;
+            return false;
         }
-        if (lastChar === "Z") {
-            return 0;
-        }
-        const match = IsoFormatter.TZ_REGEXP.exec(inp);
-
-        if (match === null) {
-            return null;
-        } else {
-            return Number(match);
-        }
+        return lastChar === "Z" || IsoFormatter.TZ_REGEXP.exec(inp) !== null;
     }
 }
