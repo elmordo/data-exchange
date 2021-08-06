@@ -12,7 +12,7 @@ export class UserSchema extends AbstractSchema
         fields.push(new Fields.Int(
             "id",
             {
-                loadName: "my_id",
+                remoteName: "my_id",
                 required: true,
                 nullable: false
             }
@@ -45,13 +45,13 @@ export class UserSchema extends AbstractSchema
 
 
 let schema = new UserSchema();
-let dumpData = {my_id: 1, created_at: new Date(), password: "my-secret-password"};
+let dumpData = {id: 1, created_at: new Date(), password: "my-secret-password"};
 
 // 'my_id' is renamed to 'id', 'password' is ignored and 'my_name' is set to 'John Doe'
 console.log("DUMPING DATA");
 console.log(schema.dump(dumpData));
 
-let loadData = {id: 6, created_at: new Date(), password: "my-secret-password", my_name: "Mr. Dead"};
+let loadData = {my_id: 6, created_at: new Date(), password: "my-secret-password", my_name: "Mr. Dead"};
 console.log("LOADING DATA");
 console.log(schema.load(loadData));
 
