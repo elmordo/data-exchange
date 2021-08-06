@@ -5,11 +5,22 @@ describe("Date and time related fields", () => {
     describe("DateTime field", () => {
         let field: DateTime;
         beforeEach(() => {
-            field = new DateTime("foo", {useUTC: false});
+            field = new DateTime("foo", {});
         });
         it("test load", () => {
             const result: Date = field.load("2021-08-05T15:17:29.871886Z");
             const expected = new Date("2021-08-05T15:17:29.871886Z");
+            expect(result).toEqual(expected);
+        });
+        it("test load with default timezone", () => {
+            const result: Date = field.load("2021-08-05T15:17:29.871886");
+            const expected = new Date("2021-08-05T15:17:29.871886Z");
+            expect(result).toEqual(expected);
+        });
+        it("test load with custom timezone default timezone", () => {
+            const result: Date = field.load("2021-08-05T15:17:29.871886+02:00");
+            const expected = new Date("2021-08-05T15:17:29.871886Z");
+            expected.setTime(expected.getTime() - 120 * 60000);
             expect(result).toEqual(expected);
         });
         it("test dump", () => {

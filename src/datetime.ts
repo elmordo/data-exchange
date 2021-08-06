@@ -25,7 +25,7 @@ export interface IsoFormatterOptions {
 
 export class IsoFormatter extends DateTimeFormatter {
 
-    static readonly TZ_REGEXP = /[\+\-]\d+$/;
+    static readonly TZ_REGEXP = /[\+\-]\d{2}:\d{2}$/;
 
     readonly defaultTimeZone?: string|null;
 
