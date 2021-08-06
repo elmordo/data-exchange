@@ -58,12 +58,31 @@ Settings values common for all built-in fields are:
 * `loadOnly` - if true, field will not be dumped
 * `filters` - list of filters
 * `validators` - list of validators
-* `dumpName` - **DEPRECATED** legacy alias for the `localName`
-* `loadName` - **DEPRECATED** legacy alias for the `remoteName`
+* ~~dumpName - legacy name for the localName~~
+* ~~loadName - legacy name for the remoteName~~
 
 For Date like fields:
 
-* `useUTC` - if true (default), UTC version of Date object's methods is used (e.g. `setUTCHours`)
+* `formatter` - instance of the date formatter (default is `IsoFormatter` with UTC as default timezone)
+* ~~useUTC - if true (default), UTC version of Date object's methods is used (e.g. setUTCHours)~~
+
+Date and time formatters
+------------------------
+
+At this time, only ISO format is supported (the `IsoFormatter` class). 
+Configuration object of the `IsoFormatter` has the following structure:
+
+* `defaultTimeZone?: string|null` - time zone used for parsing when an input data has no timezone set. Default is `Z`
+(e.g. `2021-02-03T12:31:01` -> `2021-02-03T12:31:01Z`).
+
+### DateTimeFormatter interface
+
+* `parseDate(inp: string): Date` - parse date from string
+* `parseTime(inp: string): Date` - parse time from string
+* `parseDateTime(inp: string): Date` - parse date and time from string
+* `formatDate(date: Date): string` - format date as string
+* `formatTime(date: Date): string` - format time as string
+* `formatDateTime(date: Date): string` - format date and time as string
 
 Validation and filtration
 -------------------------
