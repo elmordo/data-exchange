@@ -558,12 +558,6 @@ export class Bool extends CommonBase
 interface DateBaseOptions extends AbstractFieldOptions
 {
     /**
-     * if true (default), UTC version of Date methods is used
-     * @type {boolean}
-     */
-    useUTC?: boolean;
-
-    /**
      * formatter for date and time (default is IsoFormatter)
      */
     formatter?: DateTimeFormatter
@@ -576,12 +570,6 @@ interface DateBaseOptions extends AbstractFieldOptions
  */
 export abstract class DateBase extends CommonBase
 {
-    /**
-     * if true (default), UTC version of Date methods is used
-     * @type {boolean}
-     */
-    useUTC: boolean = true;
-
     /**
      * formatter for date and time
      */
@@ -597,7 +585,6 @@ export abstract class DateBase extends CommonBase
         super(name, options);
         options = this.prepareOptions(options);
 
-        if (options.useUTC !== undefined) this.useUTC = options.useUTC;
         if (options.formatter !== undefined) {
             this.formatter = options.formatter;
         } else {
