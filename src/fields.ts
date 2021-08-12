@@ -723,7 +723,6 @@ export class Nested extends ComplexFieldBase
     constructor(name: string, schema: SchemaInterface, options?: AbstractFieldOptions)
     {
         super(name, options);
-        options = this.prepareOptions(options);
         this.schema = schema;
     }
 
@@ -774,7 +773,6 @@ export class List extends ComplexFieldBase
     constructor(name: string, itemField: FieldInterface, options?: AbstractFieldOptions)
     {
         super(name, options);
-        options = this.prepareOptions(options);
         this.itemField = itemField;
     }
 
