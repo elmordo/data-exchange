@@ -1,6 +1,11 @@
-
 import {DateTimeFormatter, IsoFormatter} from "./datetime";
-import { FieldInterface, SchemaInterface, FilterInterface, ValidatorInterface } from "./interfaces"
+import {
+    FieldInterface,
+    FilterInterface,
+    SchemaInterface,
+    SkipIfUndefinedSettings,
+    ValidatorInterface
+} from "./interfaces"
 
 
 interface FilterSettings
@@ -16,18 +21,6 @@ interface ValidatorSettings
     inValidators: ValidatorInterface[];
 
     outValidators: ValidatorInterface[];
-}
-
-
-export interface SkipIfUndefinedSettings {
-    /**
-     * if true, attributes with undefined values will not be included in result local object when load
-     */
-    whenLoad: boolean;
-    /**
-     * if true, attributes with undefined values will not be included in result remote object when dump
-     */
-    whenDump: boolean;
 }
 
 
