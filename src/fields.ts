@@ -19,6 +19,18 @@ interface ValidatorSettings
 }
 
 
+export interface SkipIfUndefinedSettings {
+    /**
+     * if true, attributes with undefined values will not be included in result local object when load
+     */
+    whenLoad: boolean;
+    /**
+     * if true, attributes with undefined values will not be included in result remote object when dump
+     */
+    whenDump: boolean;
+}
+
+
 /**
  * common field options
  * @type {Object}
@@ -75,6 +87,11 @@ interface BaseOptions
      * if list of validators is given, same list is used for input and output
      */
     validators?: ValidatorSettings|ValidatorInterface[];
+
+    /**
+     * if true (default) value is skipped
+     */
+    skipIfUndefined?: boolean|SkipIfUndefinedSettings;
 }
 
 
@@ -123,6 +140,11 @@ export abstract class Base implements FieldInterface
     filters: FilterSettings;
 
     /**
+     * if true and some value is undefined it wont be included in result
+     */
+    skipIfUndefined: SkipIfUndefinedSettings;
+
+    /**
      * create and initialize instance
      * @param {string}      name    name of the field
      * @param {BaseOptions} options options
@@ -139,6 +161,16 @@ export abstract class Base implements FieldInterface
 
         if (options.dumpOnly !== undefined) this.dumpOnly = options.dumpOnly;
         if (options.loadOnly !== undefined) this.loadOnly = options.loadOnly;
+
+        if (options.skipIfUndefined !== undefined) {
+            if (typeof options.skipIfUndefined === "boolean") {
+                this.skipIfUndefined = {whenLoad: options.skipIfUndefined, whenDump: options.skipIfUndefined};
+            } else {
+                this.skipIfUndefined = options.skipIfUndefined;
+            }
+        } else {
+            this.skipIfUndefined = {whenLoad: true, whenDump: true};
+        }
 
         this.filters = this.createFilterSettings(options);
         this.validators = this.createValidatorSettings(options);
