@@ -44,7 +44,8 @@ export abstract class AbstractSchema<Type=any> implements SchemaInterface<Type>
 
             let name = f.remoteName;
             let val = f.load(data[name], data, result, this);
-            result[f.localName] = val;
+            if (val !== undefined)
+                result[f.localName] = val;
         });
 
         return result;
