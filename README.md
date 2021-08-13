@@ -49,15 +49,17 @@ Common fields constructor interface is
 
 Settings values common for all built-in fields are:
 
-* `required` - true if value cannot be undefined
-* `nullable` - true if value can be null
-* `defaultValue` - default value if value is undefined
-* `localName` - name of attribute in local object (default is `name`)
-* `remoteName` - name of attribute in remote object (default is `name`)
-* `dumpOnly` - if true, field will not be loaded
-* `loadOnly` - if true, field will not be dumped
-* `filters` - list of filters
-* `validators` - list of validators
+* `required: boolean` - true if value cannot be undefined
+* `nullable: boolean` - true if value can be null
+* `defaultValue: unknown` - default value if value is undefined
+* `localName: string` - name of attribute in local object (default is `name`)
+* `remoteName: string` - name of attribute in remote object (default is `name`)
+* `dumpOnly: boolean` - if true, field will not be loaded
+* `loadOnly: boolean` - if true, field will not be dumped
+* `filters: FilterSettings|FilterInterface[]` - list of filters
+* `validators: ValidatorSettings|ValidatorInterface[]` - list of validators
+* `skipIfUndefined: boolean|SkipIfUndefinedSettings` - if true (default) a property will not be included in a result 
+   object if the value should be `undefined`
 * ~~dumpName - legacy name for the localName~~
 * ~~loadName - legacy name for the remoteName~~
 
@@ -75,7 +77,22 @@ Configuration object of the `IsoFormatter` has the following structure:
 * `defaultTimeZone?: string|null` - time zone used for parsing when an input data has no timezone set. Default is `Z`
 (e.g. `2021-02-03T12:31:01` -> `2021-02-03T12:31:01Z`).
 
-### DateTimeFormatter interface
+Validation and filtration
+-------------------------
+
+Fields support validation and filtration of values. There is no validators or filters delivered with the library but 
+custom validators and filters can be written by implementing `ValidatorInterface` and `FilterInterface`.
+
+Order of the operations is:
+
+1. Apply filters
+2. Validate data
+3. dump or load data
+
+Important types
+---------------
+
+### DateTimeFormatter (interface)
 
 * `parseDate(inp: string): Date` - parse date from string
 * `parseTime(inp: string): Date` - parse time from string
@@ -84,10 +101,32 @@ Configuration object of the `IsoFormatter` has the following structure:
 * `formatTime(date: Date): string` - format time as string
 * `formatDateTime(date: Date): string` - format date and time as string
 
-Validation and filtration
--------------------------
+### ValidatorInterface
 
-Fields support validation and filtration of values. There is no validators or filters delivered with the library but custom validators and filters can be written by implementing `ValidatorInterface` and `FilterInterface`.
+* `validate(val: any, context?: any, result?: any, schema?: SchemaInterface) -> boolean` - return true if value is 
+   valid, return false otherwise
+* `getLastErrors() -> ErrorReportInterface[]` - get errors of the last validation
+
+### FilterInterface
+
+* `filter(val: any) -> any` - apply filtration to the `val` and return result
+
+### SkipIfUndefinedSettings
+
+* `whenLoad: boolean` - apply `skipIfUndefined` settings to `load()` method
+* `whenDump: boolean` - apply `skipIfUndefined` settings to `dump()` method 
+
+### FilterSettings
+
+* `inFilters: FilterInterface[]` - filters applied in `load()` method
+* `outFilters: FilterInterface[]` - filters applied in `dump()` method
+
+### FilterSettings
+
+* `inValidators: FilterInterface[]` - validators applied in `load()` method
+* `outValidators: FilterInterface[]` - validators applied in `dump()` method
+
+### ValidatorSettings
 
 Examples
 --------
