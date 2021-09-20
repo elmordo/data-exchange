@@ -40,6 +40,8 @@ There are few types of fields delivered with the library.
 * Complex fields - fields containing fields
   * `Nested` - nested schema
   * `List` - list of items with same type.
+  * `Dict` - key value pairs stored in simple object.
+  * `Map_` - key value pairs stored in the `Map` object.
 
 Common fields constructor interface is
 
@@ -168,7 +170,9 @@ class UserSchema extends AbstractSchema
         new Int("id", {loadOnly: true, remoteName: "id_user", required: true}),
         new Str("name", {required: true}),      // field cannot be undefined or NULL
         new DateTime("created_at", {required: true, nullable: false}), // field cannot be undefined, but NULL is OK
-        new List("favorite_numbers", new Int(null, {required: true})),
+        new List("favorite_numbers", new Int(null, {required: true})),  // list of integers
+        new Dict("allowed_actions", new Str(null, {required: true}), new Bool(null, {required: true})), // the key is string and value is boolean
+        new Map_("some_mapping", new Date_(null, {required: true}), new Str(null, {required: true, nullable: true})),  // the key is Date object and value is string
         new Nested("last_ban", new BanSchema(), {required: true, nullable: false})
     ]
 }
@@ -179,6 +183,8 @@ let data = {
     name: "Karel Novak",
     created_at: "2019-09-03T07:01:30.073Z",
     favorite_numbers: [1, 13, 69],
+    allowed_actions: {"action_1": true, "action_2": false},
+    some_mapping: {"2021-09-09": "foo", "2021-09-10": "bar"},
     last_ban: {
         reason: "multiple accounts",
         bannted_at: "2019-09-03T07:01:30.073Z"
