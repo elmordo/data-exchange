@@ -805,3 +805,66 @@ export class List extends ComplexFieldBase
             throw new Error("Value must be instance of Array");
     }
 }
+
+
+export abstract class AbstractMapping extends ComplexFieldBase {
+    constructor(
+        name: string,
+        protected keyType: FieldInterface,
+        protected valueType: FieldInterface,
+        options?: AbstractFieldOptions)
+    {
+        super(name, options);
+    }
+}
+
+
+export class Dict extends AbstractMapping {
+
+    dump(val: any): any {
+        val = this.resolveMissingAndNull(val);
+        if (!val) return;
+        const result = {};
+        for (const k of Object.getOwnPropertyNames(val)) {
+            result[this.keyType.dump(k)] = this.valueType.dump(val[k]);
+        }
+        return result;
+    }
+
+    load(val: any): any {
+        val = this.resolveMissingAndNull(val);
+        if (!val) return;
+        const result = {};
+        for (const k of Object.getOwnPropertyNames(val)) {
+            result[this.keyType.load(k)] = this.valueType.load(val[k]);
+        }
+        return result;
+    }
+}
+
+
+export class Map_ extends AbstractMapping {
+
+    dump(val: any): any {
+        val = this.resolveMissingAndNull(val);
+        if (!val) return;
+        if (!(val instanceof Map)) {
+            throw new Error("Value must be instance of Map");
+        }
+        const result = {};
+        for (const k of val.keys()) {
+            result[this.keyType.dump(k)] = this.valueType.dump(val.get(k));
+        }
+        return result;
+    }
+
+    load(val: any): any {
+        val = this.resolveMissingAndNull(val);
+        if (!val) return;
+        const result = new Map();
+        for (const k of Object.getOwnPropertyNames(val)) {
+            result.set(this.keyType.load(k), this.valueType.load(val[k]));
+        }
+        return result;
+    }
+}
