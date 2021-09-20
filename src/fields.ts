@@ -94,7 +94,7 @@ export abstract class Base implements FieldInterface
      * name (identifier) of the field
      * @type {string}
      */
-    name: string;
+    name: string|null;
 
     /**
      * name of the attribute where data will be dumped
@@ -142,7 +142,7 @@ export abstract class Base implements FieldInterface
      * @param {string}      name    name of the field
      * @param {BaseOptions} options options
      */
-    constructor(name: string, options?: BaseOptions)
+    constructor(name: string|null, options?: BaseOptions)
     {
         options = this.prepareOptions(options);
         if (!options.localName) options.localName = name;
@@ -326,7 +326,7 @@ export abstract class AbstractField extends Base
      * @param {string}               name    name of the field
      * @param {AbstractFieldOptions} options options
      */
-    constructor(name: string, options?: AbstractFieldOptions)
+    constructor(name: string|null, options?: AbstractFieldOptions)
     {
         super(name, options);
         options = this.prepareOptions(options);
@@ -605,7 +605,7 @@ export abstract class DateBase extends CommonBase
      * @param {string}          name    name of the field
      * @param {DateBaseOptions} options options
      */
-    constructor(name: string, options?: DateBaseOptions)
+    constructor(name: string|null, options?: DateBaseOptions)
     {
         super(name, options);
         options = this.prepareOptions(options);
@@ -713,7 +713,7 @@ export class Nested extends ComplexFieldBase
      * @param {SchemaInterface}      schema  nested schema type
      * @param {AbstractFieldOptions} options additional options
      */
-    constructor(name: string, schema: SchemaInterface, options?: AbstractFieldOptions)
+    constructor(name: string|null, schema: SchemaInterface, options?: AbstractFieldOptions)
     {
         super(name, options);
         this.schema = schema;
@@ -763,7 +763,7 @@ export class List extends ComplexFieldBase
      * @param {FieldInterface}       itemField field prototype
      * @param {AbstractFieldOptions} options   additioanl options
      */
-    constructor(name: string, itemField: FieldInterface, options?: AbstractFieldOptions)
+    constructor(name: string|null, itemField: FieldInterface, options?: AbstractFieldOptions)
     {
         super(name, options);
         this.itemField = itemField;
@@ -809,7 +809,7 @@ export class List extends ComplexFieldBase
 
 export abstract class AbstractMapping extends ComplexFieldBase {
     constructor(
-        name: string,
+        name: string|null,
         protected keyType: FieldInterface,
         protected valueType: FieldInterface,
         options?: AbstractFieldOptions)
