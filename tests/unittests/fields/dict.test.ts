@@ -8,10 +8,16 @@ describe("the dict field", () => {
     })
 
     it("should load data", () => {
-
+        const data = {foo: 11, bar: 12};
+        const expectedData = {foo: 11, bar: 12};
+        expect(field.load(data)).toEqual(expectedData);
+        expect(field.load(data)).not.toBe(data);
     });
 
     it("should dump data", () => {
-
+        const data = {foo: 11, bar: 12};
+        const expectedData = {foo: 11, bar: 12};
+        expect(field.dump(data)).toEqual(expectedData);
+        expect(field.dump(data)).not.toBe(data);
     });
 });
