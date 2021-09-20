@@ -45,7 +45,7 @@ export interface FieldInterface
      * name (identifier) of the field
      * @type {string}
      */
-    name: string;
+    name: string|null;
 
     /**
      * name of the attribute in a remote object
