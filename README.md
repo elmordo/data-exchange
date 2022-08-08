@@ -40,6 +40,8 @@ There are few types of fields delivered with the library.
 * Complex fields - fields containing fields
   * `Nested` - nested schema
   * `List` - list of items with same type.
+  * `Dict` - key value pairs stored in simple object.
+  * `Map_` - key value pairs stored in the `Map` object.
 
 Common fields constructor interface is
 
@@ -49,15 +51,17 @@ Common fields constructor interface is
 
 Settings values common for all built-in fields are:
 
-* `required` - true if value cannot be undefined
-* `nullable` - true if value can be null
-* `defaultValue` - default value if value is undefined
-* `localName` - name of attribute in local object (default is `name`)
-* `remoteName` - name of attribute in remote object (default is `name`)
-* `dumpOnly` - if true, field will not be loaded
-* `loadOnly` - if true, field will not be dumped
-* `filters` - list of filters
-* `validators` - list of validators
+* `required: boolean` - true if value cannot be undefined
+* `nullable: boolean` - true if value can be null
+* `defaultValue: unknown` - default value if value is undefined
+* `localName: string` - name of attribute in local object (default is `name`)
+* `remoteName: string` - name of attribute in remote object (default is `name`)
+* `dumpOnly: boolean` - if true, field will not be loaded
+* `loadOnly: boolean` - if true, field will not be dumped
+* `filters: FilterSettings|FilterInterface[]` - list of filters
+* `validators: ValidatorSettings|ValidatorInterface[]` - list of validators
+* `skipIfUndefined: boolean|SkipIfUndefinedSettings` - if true (default) a property will not be included in a result 
+   object if the value should be `undefined`
 * ~~dumpName - legacy name for the localName~~
 * ~~loadName - legacy name for the remoteName~~
 
@@ -75,7 +79,22 @@ Configuration object of the `IsoFormatter` has the following structure:
 * `defaultTimeZone?: string|null` - time zone used for parsing when an input data has no timezone set. Default is `Z`
 (e.g. `2021-02-03T12:31:01` -> `2021-02-03T12:31:01Z`).
 
-### DateTimeFormatter interface
+Validation and filtration
+-------------------------
+
+Fields support validation and filtration of values. There is no validators or filters delivered with the library but 
+custom validators and filters can be written by implementing `ValidatorInterface` and `FilterInterface`.
+
+Order of the operations is:
+
+1. Apply filters
+2. Validate data
+3. dump or load data
+
+Important types
+---------------
+
+### DateTimeFormatter (interface)
 
 * `parseDate(inp: string): Date` - parse date from string
 * `parseTime(inp: string): Date` - parse time from string
@@ -84,10 +103,32 @@ Configuration object of the `IsoFormatter` has the following structure:
 * `formatTime(date: Date): string` - format time as string
 * `formatDateTime(date: Date): string` - format date and time as string
 
-Validation and filtration
--------------------------
+### ValidatorInterface
 
-Fields support validation and filtration of values. There is no validators or filters delivered with the library but custom validators and filters can be written by implementing `ValidatorInterface` and `FilterInterface`.
+* `validate(val: any, context?: any, result?: any, schema?: SchemaInterface) -> boolean` - return true if value is 
+   valid, return false otherwise
+* `getLastErrors() -> ErrorReportInterface[]` - get errors of the last validation
+
+### FilterInterface
+
+* `filter(val: any) -> any` - apply filtration to the `val` and return result
+
+### SkipIfUndefinedSettings
+
+* `whenLoad: boolean` - apply `skipIfUndefined` settings to `load()` method
+* `whenDump: boolean` - apply `skipIfUndefined` settings to `dump()` method 
+
+### FilterSettings
+
+* `inFilters: FilterInterface[]` - filters applied in `load()` method
+* `outFilters: FilterInterface[]` - filters applied in `dump()` method
+
+### FilterSettings
+
+* `inValidators: FilterInterface[]` - validators applied in `load()` method
+* `outValidators: FilterInterface[]` - validators applied in `dump()` method
+
+### ValidatorSettings
 
 Examples
 --------
@@ -129,7 +170,9 @@ class UserSchema extends AbstractSchema
         new Int("id", {loadOnly: true, remoteName: "id_user", required: true}),
         new Str("name", {required: true}),      // field cannot be undefined or NULL
         new DateTime("created_at", {required: true, nullable: false}), // field cannot be undefined, but NULL is OK
-        new List("favorite_numbers", new Int(null, {required: true})),
+        new List("favorite_numbers", new Int(null, {required: true})),  // list of integers
+        new Dict("allowed_actions", new Str(null, {required: true}), new Bool(null, {required: true})), // the key is string and value is boolean
+        new Map_("some_mapping", new Date_(null, {required: true}), new Str(null, {required: true, nullable: true})),  // the key is Date object and value is string
         new Nested("last_ban", new BanSchema(), {required: true, nullable: false})
     ]
 }
@@ -140,6 +183,8 @@ let data = {
     name: "Karel Novak",
     created_at: "2019-09-03T07:01:30.073Z",
     favorite_numbers: [1, 13, 69],
+    allowed_actions: {"action_1": true, "action_2": false},
+    some_mapping: {"2021-09-09": "foo", "2021-09-10": "bar"},
     last_ban: {
         reason: "multiple accounts",
         bannted_at: "2019-09-03T07:01:30.073Z"

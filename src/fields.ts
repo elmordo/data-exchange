@@ -1,6 +1,11 @@
-
 import {DateTimeFormatter, IsoFormatter} from "./datetime";
-import { FieldInterface, SchemaInterface, FilterInterface, ValidatorInterface } from "./interfaces"
+import {
+    FieldInterface,
+    FilterInterface,
+    SchemaInterface,
+    SkipIfUndefinedSettings,
+    ValidatorInterface
+} from "./interfaces"
 
 
 interface FilterSettings
@@ -75,6 +80,11 @@ interface BaseOptions
      * if list of validators is given, same list is used for input and output
      */
     validators?: ValidatorSettings|ValidatorInterface[];
+
+    /**
+     * if true (default) value is skipped
+     */
+    skipIfUndefined?: boolean|SkipIfUndefinedSettings;
 }
 
 
@@ -84,7 +94,7 @@ export abstract class Base implements FieldInterface
      * name (identifier) of the field
      * @type {string}
      */
-    name: string;
+    name: string|null;
 
     /**
      * name of the attribute where data will be dumped
@@ -123,11 +133,16 @@ export abstract class Base implements FieldInterface
     filters: FilterSettings;
 
     /**
+     * if true and some value is undefined it wont be included in result
+     */
+    skipIfUndefined: SkipIfUndefinedSettings;
+
+    /**
      * create and initialize instance
      * @param {string}      name    name of the field
      * @param {BaseOptions} options options
      */
-    constructor(name: string, options?: BaseOptions)
+    constructor(name: string|null, options?: BaseOptions)
     {
         options = this.prepareOptions(options);
         if (!options.localName) options.localName = name;
@@ -139,6 +154,16 @@ export abstract class Base implements FieldInterface
 
         if (options.dumpOnly !== undefined) this.dumpOnly = options.dumpOnly;
         if (options.loadOnly !== undefined) this.loadOnly = options.loadOnly;
+
+        if (options.skipIfUndefined !== undefined) {
+            if (typeof options.skipIfUndefined === "boolean") {
+                this.skipIfUndefined = {whenLoad: options.skipIfUndefined, whenDump: options.skipIfUndefined};
+            } else {
+                this.skipIfUndefined = options.skipIfUndefined;
+            }
+        } else {
+            this.skipIfUndefined = {whenLoad: true, whenDump: true};
+        }
 
         this.filters = this.createFilterSettings(options);
         this.validators = this.createValidatorSettings(options);
@@ -301,7 +326,7 @@ export abstract class AbstractField extends Base
      * @param {string}               name    name of the field
      * @param {AbstractFieldOptions} options options
      */
-    constructor(name: string, options?: AbstractFieldOptions)
+    constructor(name: string|null, options?: AbstractFieldOptions)
     {
         super(name, options);
         options = this.prepareOptions(options);
@@ -580,7 +605,7 @@ export abstract class DateBase extends CommonBase
      * @param {string}          name    name of the field
      * @param {DateBaseOptions} options options
      */
-    constructor(name: string, options?: DateBaseOptions)
+    constructor(name: string|null, options?: DateBaseOptions)
     {
         super(name, options);
         options = this.prepareOptions(options);
@@ -688,10 +713,9 @@ export class Nested extends ComplexFieldBase
      * @param {SchemaInterface}      schema  nested schema type
      * @param {AbstractFieldOptions} options additional options
      */
-    constructor(name: string, schema: SchemaInterface, options?: AbstractFieldOptions)
+    constructor(name: string|null, schema: SchemaInterface, options?: AbstractFieldOptions)
     {
         super(name, options);
-        options = this.prepareOptions(options);
         this.schema = schema;
     }
 
@@ -739,10 +763,9 @@ export class List extends ComplexFieldBase
      * @param {FieldInterface}       itemField field prototype
      * @param {AbstractFieldOptions} options   additioanl options
      */
-    constructor(name: string, itemField: FieldInterface, options?: AbstractFieldOptions)
+    constructor(name: string|null, itemField: FieldInterface, options?: AbstractFieldOptions)
     {
         super(name, options);
-        options = this.prepareOptions(options);
         this.itemField = itemField;
     }
 
@@ -780,5 +803,68 @@ export class List extends ComplexFieldBase
 
         if (val && !(val instanceof Array))
             throw new Error("Value must be instance of Array");
+    }
+}
+
+
+export abstract class AbstractMapping extends ComplexFieldBase {
+    constructor(
+        name: string|null,
+        protected keyType: FieldInterface,
+        protected valueType: FieldInterface,
+        options?: AbstractFieldOptions)
+    {
+        super(name, options);
+    }
+}
+
+
+export class Dict extends AbstractMapping {
+
+    dump(val: any): any {
+        val = this.resolveMissingAndNull(val);
+        if (!val) return;
+        const result = {};
+        for (const k of Object.getOwnPropertyNames(val)) {
+            result[this.keyType.dump(k)] = this.valueType.dump(val[k]);
+        }
+        return result;
+    }
+
+    load(val: any): any {
+        val = this.resolveMissingAndNull(val);
+        if (!val) return;
+        const result = {};
+        for (const k of Object.getOwnPropertyNames(val)) {
+            result[this.keyType.load(k)] = this.valueType.load(val[k]);
+        }
+        return result;
+    }
+}
+
+
+export class Map_ extends AbstractMapping {
+
+    dump(val: any): any {
+        val = this.resolveMissingAndNull(val);
+        if (!val) return;
+        if (!(val instanceof Map)) {
+            throw new Error("Value must be instance of Map");
+        }
+        const result = {};
+        for (const k of val.keys()) {
+            result[this.keyType.dump(k)] = this.valueType.dump(val.get(k));
+        }
+        return result;
+    }
+
+    load(val: any): any {
+        val = this.resolveMissingAndNull(val);
+        if (!val) return;
+        const result = new Map();
+        for (const k of Object.getOwnPropertyNames(val)) {
+            result.set(this.keyType.load(k), this.valueType.load(val[k]));
+        }
+        return result;
     }
 }

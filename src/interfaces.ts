@@ -1,5 +1,3 @@
-
-
 /**
  * define interface for all schema implementations
  * @type {Object}
@@ -24,6 +22,19 @@ export interface SchemaInterface<Type=any>
 }
 
 
+export interface SkipIfUndefinedSettings {
+    /**
+     * if true, attributes with undefined values will not be included in result local object when load
+     */
+    whenLoad: boolean;
+    /**
+     * if true, attributes with undefined values will not be included in result remote object when dump
+     */
+    whenDump: boolean;
+}
+
+
+
 /**
  * interface for fields
  * @type {Object}
@@ -34,7 +45,7 @@ export interface FieldInterface
      * name (identifier) of the field
      * @type {string}
      */
-    name: string;
+    name: string|null;
 
     /**
      * name of the attribute in a remote object
@@ -59,6 +70,11 @@ export interface FieldInterface
      * @type {boolean}
      */
     loadOnly: boolean;
+
+    /**
+     * if true (default) value is skipped
+     */
+    skipIfUndefined: SkipIfUndefinedSettings;
 
     /**
      * dump value to raw JSON object
