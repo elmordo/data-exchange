@@ -180,26 +180,8 @@ export abstract class Base implements FieldInterface
         options = this.prepareOptions(options);
         if (!options.localName) options.localName = name;
         if (!options.remoteName) options.remoteName = name;
-
         this.name = name;
-        this.localName = options.localName;
-        this.remoteName = options.remoteName;
-
-        if (options.dumpOnly !== undefined) this.dumpOnly = options.dumpOnly;
-        if (options.loadOnly !== undefined) this.loadOnly = options.loadOnly;
-
-        if (options.skipIfUndefined !== undefined) {
-            if (typeof options.skipIfUndefined === "boolean") {
-                this.skipIfUndefined = {whenLoad: options.skipIfUndefined, whenDump: options.skipIfUndefined};
-            } else {
-                this.skipIfUndefined = options.skipIfUndefined;
-            }
-        } else {
-            this.skipIfUndefined = {whenLoad: true, whenDump: true};
-        }
-
-        this.filters = this.createFilterSettings(options);
-        this.validators = this.createValidatorSettings(options);
+        this.applyOptions(options);
     }
 
     /**
@@ -277,6 +259,32 @@ export abstract class Base implements FieldInterface
             return {inValidators: validators, outValidators: validators};
         else
             return validators as ValidatorSettings;
+    }
+
+    private applyOptions<T extends BaseOptions>(options?: T): void {
+        options = this.prepareOptions(options);
+        this.processOptions(options);
+    }
+
+    protected processOptions<T extends BaseOptions>(options: T): void {
+        this.localName = options.localName;
+        this.remoteName = options.remoteName;
+
+        if (options.dumpOnly !== undefined) this.dumpOnly = options.dumpOnly;
+        if (options.loadOnly !== undefined) this.loadOnly = options.loadOnly;
+
+        if (options.skipIfUndefined !== undefined) {
+            if (typeof options.skipIfUndefined === "boolean") {
+                this.skipIfUndefined = {whenLoad: options.skipIfUndefined, whenDump: options.skipIfUndefined};
+            } else {
+                this.skipIfUndefined = options.skipIfUndefined;
+            }
+        } else {
+            this.skipIfUndefined = {whenLoad: true, whenDump: true};
+        }
+
+        this.filters = this.createFilterSettings(options);
+        this.validators = this.createValidatorSettings(options);
     }
 }
 
