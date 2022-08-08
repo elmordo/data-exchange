@@ -150,6 +150,15 @@ export class DeclarativeSchema<Type=any> extends AbstractSchema<Type> {
         for (const propertyName of Object.getOwnPropertyNames(this)) {
             const propertyValue = this[propertyName];
             if (this.isValueField(propertyValue)) {
+                if (propertyValue.name === null) {
+                    propertyValue.name = propertyName;
+                }
+                if (propertyValue.remoteName === null) {
+                    propertyValue.remoteName = propertyName;
+                }
+                if (propertyValue.localName === null) {
+                    propertyValue.localName = propertyName;
+                }
                 result.push(propertyValue);
             }
         }
