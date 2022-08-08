@@ -4,9 +4,9 @@ describe("the dict field", () => {
     let field: Dict;
 
     ([
-        ["when name is null", () => new Dict(null, new Str(null), new Int(null))],
-        ["when name is set", () => new Dict(null, new Str(null), new Int(null))],
-        ["when name is omitted", () => new Dict(null, new Str(null), new Int(null))],
+        ["when name is null", () => new Dict(null, new Str(), new Int())],
+        ["when name is set", () => new Dict("my dict", new Str(), new Int())],
+        ["when name is omitted", () => new Dict(new Str(), new Int())],
     ] as [string, () => Dict][]).forEach(([name, factory]) => {
         describe(name, () => {
             beforeEach(() => {
