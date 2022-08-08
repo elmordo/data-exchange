@@ -16,12 +16,43 @@ Main features
 Schemas
 -------
 
+Schemas are container for fields. There are two schema definition approach you can use.
+
+### Extending the `AbstractSchema` class (legacy)
+
 Base building block is schema with fields. There are two ways to define fields:
 
 1. set `fields` property of the `AbstractSchema` class
 2. override a `createFields()` method
 
 The first way is suitable for most cases of use. The second one can be used to define more complex schema with custom cross field validators and/or some custom special logic in schema definition.
+
+### Declarative approach (recommended)
+
+From version `2.3` you can use the declarative approach to define your schemas.
+
+Create object extending the `DeclarativeSchema` class and defined fields as its properties:
+
+```typescript
+class MyDeclarativeSchema extends DeclarativeSchema {
+    id = new Int({required: true});
+    name = new Str({required: true});
+    description = new Str({required: true, nullable: false});
+}
+
+
+class MyOtherSchema extends MyDeclarativeSchema {
+    ownerName = new Str({required: true, remoteName: "owner_name"})
+}
+```
+
+The declarative schema is recommended because it is more intuitive and it can be easily extended by inheritance.
+
+A field names are resolved by following algorithm:
+
+* if `name` attribute is `null`, set it to property name (the `name` attribute can be set by explicit assign in constructor `attr = new Str("some_explicit_name", {...})`)
+* if `remoteName` attribute is `null`, set it to property name
+* if `localName` attribute is `null`, set it to property name
 
 Fields
 ------
@@ -45,7 +76,7 @@ There are few types of fields delivered with the library.
 
 Common fields constructor interface is
 
-1. field name
+1. field name (can be omitted from version `2.3`)
 2. required arguments (e.g. another schema instance for `Nested`)
 3. object with optional settings
 
@@ -136,7 +167,7 @@ Examples
 Sample schema definition
 
 ```TypeScript
-import { AbstractSchema, Int, Str, Date_, Nested, List } from "data-exchange"
+import { DeclarativeSchema, Int, Str, Date_, Nested, List } from "data-exchange"
 
 
 class Ban
@@ -147,15 +178,10 @@ class Ban
 }
 
 
-class BanSchema extends AbstractSchema<Ban>
+class BanSchema extends DeclarativeSchema<Ban>
 {
-    createFields()
-    {
-        return [
-            new Str("reason", {required: true}),
-            new Date_("banned_at", {required: true})
-        ]
-    }
+    reason = new Str({required: true});
+    banne_at = new Date_({required: true});
 
     createObject(): Ban
     {
@@ -164,17 +190,15 @@ class BanSchema extends AbstractSchema<Ban>
 }
 
 
-class UserSchema extends AbstractSchema
+class UserSchema extends DeclarativeSchema
 {
-    fields = [
-        new Int("id", {loadOnly: true, remoteName: "id_user", required: true}),
-        new Str("name", {required: true}),      // field cannot be undefined or NULL
-        new DateTime("created_at", {required: true, nullable: false}), // field cannot be undefined, but NULL is OK
-        new List("favorite_numbers", new Int(null, {required: true})),  // list of integers
-        new Dict("allowed_actions", new Str(null, {required: true}), new Bool(null, {required: true})), // the key is string and value is boolean
-        new Map_("some_mapping", new Date_(null, {required: true}), new Str(null, {required: true, nullable: true})),  // the key is Date object and value is string
-        new Nested("last_ban", new BanSchema(), {required: true, nullable: false})
-    ]
+    id = new Int({loadOnly: true, remoteName: "id_user", required: true});
+    name = new Str({required: true})      // field cannot be undefined or NULL
+    created_at = new DateTime({required: true, nullable: false}) // field cannot be undefined, but NULL is OK
+    favorite_numbers = new List(new Int(null, {required: true}))  // list of integers
+    allowed_actions = new Dict(new Str(null, {required: true}), new Bool(null, {required: true})) // the key is string and value is boolean
+    some_mappoing = new Map_(new Date_(null, {required: true}), new Str(null, {required: true, nullable: true}))  // the key is Date object and value is string
+    last_ban = new Nested(new BanSchema(), {required: true, nullable: false})
 }
 
 
