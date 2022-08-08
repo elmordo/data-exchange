@@ -265,7 +265,7 @@ export abstract class Base implements FieldInterface
         if (filters instanceof Array)
             return {inFilters: filters, outFilters: filters.slice().reverse()}
         else
-            return filters;
+            return filters as FilterSettings;
     }
 
     private createValidatorSettings(options: BaseOptions): ValidatorSettings
@@ -276,7 +276,7 @@ export abstract class Base implements FieldInterface
         if (validators instanceof Array)
             return {inValidators: validators, outValidators: validators};
         else
-            return validators;
+            return validators as ValidatorSettings;
     }
 }
 
