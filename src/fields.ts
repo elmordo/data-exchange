@@ -113,7 +113,7 @@ interface BaseOptions
 }
 
 
-export abstract class Base implements FieldInterface
+export abstract class Base<OptionsType extends BaseOptions = BaseOptions> implements FieldInterface
 {
     /**
      * name (identifier) of the field
@@ -166,17 +166,17 @@ export abstract class Base implements FieldInterface
      * create instance with name set to null
      * @param options
      */
-    constructor(options?: BaseOptions);
+    constructor(options?: OptionsType);
     /**
      * create and initialize instance
-     * @param {string}      name    name of the field
-     * @param {BaseOptions} options options
+     * @param name    name of the field
+     * @param options options
      */
-    constructor(name: string|null, options?: BaseOptions);
+    constructor(name: string|null, options?: OptionsType);
 
     constructor(...args: any)
     {
-        let [name, options] = parseCommonConstructorArgs<BaseOptions>(args);
+        let [name, options] = parseCommonConstructorArgs<OptionsType>(args);
         options = this.prepareOptions(options);
         if (!options.localName) options.localName = name;
         if (!options.remoteName) options.remoteName = name;
@@ -342,7 +342,7 @@ interface AbstractFieldOptions extends BaseOptions
  *
  * @type {Object}
  */
-export abstract class AbstractField extends Base
+export abstract class AbstractField<OptionsType extends AbstractFieldOptions = AbstractFieldOptions> extends Base<OptionsType>
 {
     /**
      * is field requried?
@@ -361,24 +361,6 @@ export abstract class AbstractField extends Base
      * @type {any}
      */
     defaultValue: any;
-
-    /**
-     * create and initialize instance
-     * @param {string}               name    name of the field
-     * @param {AbstractFieldOptions} options options
-     */
-    constructor(name: string|null, options?: AbstractFieldOptions)
-    {
-        super(name, options);
-        options = this.prepareOptions(options);
-
-        if (options.required !== undefined && options.nullable === undefined)
-            options.nullable = !options.required;
-
-        if (options.required !== undefined) this.required = options.required;
-        if (options.nullable !== undefined) this.nullable = options.nullable;
-        if (options.defaultValue !== undefined) this.defaultValue = options.defaultValue;
-    }
 
     /**
      * resolve basic validation tests (required and missing)
@@ -420,6 +402,17 @@ export abstract class AbstractField extends Base
             throw new Error("Value '" + this.name + "' is NULL");
 
         return val;
+    }
+
+    protected processOptions<T extends AbstractFieldOptions>(options: T) {
+        super.processOptions(options);
+
+        if (options.required !== undefined && options.nullable === undefined)
+            options.nullable = !options.required;
+
+        if (options.required !== undefined) this.required = options.required;
+        if (options.nullable !== undefined) this.nullable = options.nullable;
+        if (options.defaultValue !== undefined) this.defaultValue = options.defaultValue;
     }
 }
 
