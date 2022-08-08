@@ -889,13 +889,66 @@ export class List extends ComplexFieldBase
 
 
 export abstract class AbstractMapping extends ComplexFieldBase {
+
+    /**
+     * type of the keys
+     * @protected
+     */
+    protected keyType: FieldInterface
+
+    /**
+     * type of the values
+     * @protected
+     */
+    protected valueType: FieldInterface
+
+    /**
+     * initialize instance
+     * @param name name of the field
+     * @param keyType type of keys
+     * @param valueType type of values
+     * @param options options
+     */
     constructor(
         name: string|null,
-        protected keyType: FieldInterface,
-        protected valueType: FieldInterface,
-        options?: AbstractFieldOptions)
+        keyType: FieldInterface,
+        valueType: FieldInterface,
+        options?: AbstractFieldOptions
+    );
+
+    /**
+     * initialize instance with name set to null
+     * @param keyType type of keys
+     * @param valueType type of values
+     * @param options options
+     */
+    constructor(
+        keyType: FieldInterface,
+        valueType: FieldInterface,
+        options?: AbstractFieldOptions
+    );
+
+    constructor(...args: any)
     {
+        let name: string | null = null;
+        let options: AbstractFieldOptions | undefined;
+        let keyType: FieldInterface;
+        let valueType: FieldInterface;
+        if (typeof args[0] === "object" && args[0] !== null) {
+            // name is not set
+            keyType = args[0];
+            valueType = args[1];
+            options = args[2];
+        } else {
+            // name is set
+            name = args[0];
+            keyType = args[1];
+            valueType = args[2];
+            options = args[3];
+        }
         super(name, options);
+        this.keyType = keyType;
+        this.valueType = valueType;
     }
 }
 
