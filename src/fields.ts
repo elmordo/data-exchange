@@ -741,6 +741,11 @@ export class Nested extends ComplexFieldBase
      */
     schema: SchemaInterface;
 
+    /**
+     * initialize instance with name set to null
+     * @param {SchemaInterface}      schema  nested schema type
+     * @param {AbstractFieldOptions} options additional options
+     */
     constructor(schema: SchemaInterface, options?: AbstractFieldOptions);
 
     /**
@@ -811,15 +816,38 @@ export class List extends ComplexFieldBase
     itemField: FieldInterface;
 
     /**
+     * initialize instance with name set to null
+     * @param {FieldInterface}       itemField field prototype
+     * @param {AbstractFieldOptions} options   additioanl options
+     */
+    constructor(itemField: FieldInterface, options?: AbstractFieldOptions);
+
+    /**
      * initialize instance
      * @param {string}               name      name of the field
      * @param {FieldInterface}       itemField field prototype
      * @param {AbstractFieldOptions} options   additioanl options
      */
-    constructor(name: string|null, itemField: FieldInterface, options?: AbstractFieldOptions)
+    constructor(name: string|null, itemField: FieldInterface, options?: AbstractFieldOptions);
+
+    constructor(...args: any)
     {
+        let name: string | null = null;
+        let options: AbstractFieldOptions | undefined;
+        let field: FieldInterface;
+
+        if (typeof args[0] === "object") {
+            // name is not set
+            field = args[0];
+            options = args[1];
+        } else {
+            // name is set
+            name = args[0];
+            field = args[1];
+            options = args[2];
+        }
         super(name, options);
-        this.itemField = itemField;
+        this.itemField = field;
     }
 
     /**
