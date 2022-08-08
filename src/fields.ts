@@ -762,7 +762,7 @@ export class Nested extends ComplexFieldBase
         let options: AbstractFieldOptions | undefined;
         let schema: SchemaInterface;
 
-        if (typeof args[0] === "object") {
+        if (typeof args[0] === "object" && args[0] !== null) {
             // name is not set
             schema = args[0];
             options = args[1];
@@ -836,7 +836,7 @@ export class List extends ComplexFieldBase
         let options: AbstractFieldOptions | undefined;
         let field: FieldInterface;
 
-        if (typeof args[0] === "object") {
+        if (typeof args[0] === "object" && args[0] !== null) {
             // name is not set
             field = args[0];
             options = args[1];
