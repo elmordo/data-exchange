@@ -1,4 +1,5 @@
 
+import {Base} from "./fields";
 import { SchemaInterface, FieldInterface } from "./interfaces"
 import { ErrorReport } from "./errors"
 
@@ -28,9 +29,9 @@ export abstract class AbstractSchema<Type=any> implements SchemaInterface<Type>
 
     /**
      * load data from raw JSON object, validate them and convert to the defined data format
-     * @param  {Object} data raw data from source
-     * @param  {Type}   target target object to load data into
-     * @return {Type}         converted and validated data
+     * @param data raw data from source
+     * @param target target object to load data into
+     * @return converted and validated data
      */
     load(data: Object, target?: Type): Type
     {
@@ -53,8 +54,8 @@ export abstract class AbstractSchema<Type=any> implements SchemaInterface<Type>
 
     /**
      * validate data and convert them to the raw JSON object
-     * @param  {Type}    data data to be dumped
-     * @return {Object}      raw JSON object
+     * @param data data to be dumped
+     * @return raw JSON object
      */
     dump(data: Type): Object
     {
@@ -114,7 +115,7 @@ export abstract class AbstractSchema<Type=any> implements SchemaInterface<Type>
 
     /**
      * create an output object instance
-     * @return {Type} Any object
+     * @return Any object
      */
     createObject(): Type
     {
@@ -133,5 +134,55 @@ export abstract class AbstractSchema<Type=any> implements SchemaInterface<Type>
             this.fields = this.createFields();
 
         return this.fields;
+    }
+}
+
+
+/**
+ * base class for declarative schema
+ */
+export class DeclarativeSchema<Type=any> extends AbstractSchema<Type> {
+    /**
+     * parse schema instance and create new fields.
+     */
+    createFields(): FieldInterface[] {
+        const result: FieldInterface[] = [];
+        for (const propertyName of Object.getOwnPropertyNames(this)) {
+            const propertyValue = this[propertyName];
+            if (this.isValueField(propertyValue)) {
+                result.push(propertyValue);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * test value is implementation of the FieldInterface
+     * @param value value to be tested
+     * @return true if value match FieldInterface, false otherwise
+     * @protected
+     */
+    protected isValueField(value: any): boolean {
+        return value instanceof Base || this.matchFieldInterface(value);
+    }
+
+    /**
+     * test value contains attributes and methods of the FieldInterface
+     * @param value
+     * @protected
+     */
+    protected matchFieldInterface(value: any): boolean {
+        return (
+            typeof value === "object" &&
+                value !== null &&
+                "name" in value &&
+                "remoteName" in value &&
+                "localName" in value &&
+                "dumpOnly" in value &&
+                "loadOnly" in value &&
+                "skipIfUndefined" in value &&
+                "dump" in value && typeof value.dump === "function" &&
+                "load" in value && typeof value.load === "function"
+        );
     }
 }
