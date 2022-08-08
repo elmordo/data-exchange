@@ -24,6 +24,31 @@ interface ValidatorSettings
 }
 
 
+function parseCommonConstructorArgs<T>(args: any[]): [string | null, T | undefined] {
+    let name: string | null = null;
+    let options: T | undefined = undefined;
+
+    switch (args.length) {
+        case 0:
+            break;
+        case 1:
+            if (typeof args[0] === "string") {
+                name = args[0];
+            } else {
+                options = args[0];
+            }
+            break;
+        case 2:
+            [name, options] = args;
+            break;
+        default:
+            throw new Error("Invalid constructor arguments");
+    }
+
+    return [name, options];
+}
+
+
 /**
  * common field options
  * @type {Object}
@@ -138,12 +163,20 @@ export abstract class Base implements FieldInterface
     skipIfUndefined: SkipIfUndefinedSettings;
 
     /**
+     * create instance with name set to null
+     * @param options
+     */
+    constructor(options?: BaseOptions);
+    /**
      * create and initialize instance
      * @param {string}      name    name of the field
      * @param {BaseOptions} options options
      */
-    constructor(name: string|null, options?: BaseOptions)
+    constructor(name: string|null, options?: BaseOptions);
+
+    constructor(...args: any)
     {
+        let [name, options] = parseCommonConstructorArgs<BaseOptions>(args);
         options = this.prepareOptions(options);
         if (!options.localName) options.localName = name;
         if (!options.remoteName) options.remoteName = name;
