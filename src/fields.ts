@@ -635,13 +635,23 @@ export abstract class DateBase extends CommonBase
     formatter: DateTimeFormatter;
 
     /**
-     * initialize instance
-     * @param {string}          name    name of the field
-     * @param {DateBaseOptions} options options
+     * create instance with name set to null
+     * @param options
      */
-    constructor(name: string|null, options?: DateBaseOptions)
+    constructor(options?: DateBaseOptions);
+
+    /**
+     * create and initialize instance
+     * @param name    name of the field
+     * @param options options
+     */
+    constructor(name: string|null, options?: DateBaseOptions);
+
+    constructor(...args: any)
     {
-        super(name, options);
+        super(...args);
+        let options: DateBaseOptions | undefined;
+        options = parseCommonConstructorArgs(args)[1];
         options = this.prepareOptions(options);
 
         if (options.formatter !== undefined) {
