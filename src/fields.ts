@@ -898,6 +898,9 @@ export class List extends ComplexFieldBase
 }
 
 
+/**
+ * base class for mapping types
+ */
 export abstract class AbstractMapping extends ComplexFieldBase {
 
     /**
@@ -963,6 +966,9 @@ export abstract class AbstractMapping extends ComplexFieldBase {
 }
 
 
+/**
+ * write deserialized data into object as its properties
+ */
 export class Dict extends AbstractMapping {
 
     dump(val: any): any {
@@ -987,6 +993,9 @@ export class Dict extends AbstractMapping {
 }
 
 
+/**
+ * write deserialized data into the Map.
+ */
 export class Map_ extends AbstractMapping {
 
     dump(val: any): any {
@@ -1010,5 +1019,19 @@ export class Map_ extends AbstractMapping {
             result.set(this.keyType.load(k), this.valueType.load(val[k]));
         }
         return result;
+    }
+}
+
+
+/**
+ * data are passed from/to local/remote side "as is". No modification is done on a data.
+ */
+export class Raw extends AbstractField {
+    dump(val: any): any {
+        return val;
+    }
+
+    load(val: any): any {
+        return val;
     }
 }
