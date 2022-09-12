@@ -898,6 +898,9 @@ export class List extends ComplexFieldBase
 }
 
 
+/**
+ * base class for mapping types
+ */
 export abstract class AbstractMapping extends ComplexFieldBase {
 
     /**
@@ -963,6 +966,9 @@ export abstract class AbstractMapping extends ComplexFieldBase {
 }
 
 
+/**
+ * write deserialized data into object as its properties
+ */
 export class Dict extends AbstractMapping {
 
     dump(val: any): any {
@@ -987,6 +993,9 @@ export class Dict extends AbstractMapping {
 }
 
 
+/**
+ * write deserialized data into the Map.
+ */
 export class Map_ extends AbstractMapping {
 
     dump(val: any): any {
@@ -1011,4 +1020,95 @@ export class Map_ extends AbstractMapping {
         }
         return result;
     }
+}
+
+
+/**
+ * data are passed from/to local/remote side "as is". No modification is done on a data.
+ */
+export class Raw extends AbstractField {
+    dump(val: any): any {
+        return val;
+    }
+
+    load(val: any): any {
+        return val;
+    }
+}
+
+
+/**
+ * field using callbacks for loading and dumping data
+ */
+export class Callbacks extends AbstractField {
+
+    /**
+     * callback used for data load
+     */
+    loadFn: (val: any, context: any, result: any, schema: SchemaInterface | undefined) => any;
+
+    /**
+     * callback used for data dump
+     */
+    dumpFn: (val: any, context: any, result: any, schema: SchemaInterface | undefined) => any;
+
+    /**
+     * initialize instance with name set to null
+     * @param loadFn callback used for data load
+     * @param dumpFn callback used for data dump
+     * @param {AbstractFieldOptions} options additional options
+     */
+    constructor(
+        loadFn: (val: any, context: any, result: any, schema: SchemaInterface | undefined) => any,
+        dumpFn: (val: any, context: any, result: any, schema: SchemaInterface | undefined) => any,
+        options?: AbstractFieldOptions
+    );
+
+    /**
+     * initialize instance
+     * @param {string} name name of the field
+     * @param loadFn callback used for data load
+     * @param dumpFn callback used for data dump
+     * @param {AbstractFieldOptions} options additional options
+     */
+    constructor(
+        name: string|null,
+        loadFn: (val: any, context: any, result: any, schema: SchemaInterface | undefined) => any,
+        dumpFn: (val: any, context: any, result: any, schema: SchemaInterface | undefined) => any,
+        options?: AbstractFieldOptions
+    );
+
+    constructor(...args: any)
+    {
+        let name: string | null = null;
+        let options: AbstractFieldOptions | undefined;
+        let loadFn: any, dumpFn: any;
+
+        if (typeof args[0] === "string") {
+            // name is not set
+            name = args[0];
+            loadFn = args[1];
+            dumpFn = args[2];
+            options = args[3];
+        } else {
+            // name is set
+            loadFn = args[0];
+            dumpFn = args[1];
+            options = args[2];
+        }
+
+        super(name, options);
+        this.loadFn = loadFn;
+        this.dumpFn = dumpFn;
+    }
+
+
+    dump(val: any, context: any, result: any, schema: SchemaInterface | undefined): any {
+        return this.dumpFn(val, context, result, schema);
+    }
+
+    load(val: any, context: any, result: any, schema: SchemaInterface | undefined): any {
+        return this.loadFn(val, context, result, schema);
+    }
+
 }
