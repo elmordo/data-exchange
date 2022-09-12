@@ -1089,7 +1089,7 @@ export class Callbacks extends AbstractField {
             name = args[0];
             loadFn = args[1];
             dumpFn = args[2];
-            options = args[1];
+            options = args[3];
         } else {
             // name is set
             loadFn = args[0];
