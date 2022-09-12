@@ -33,7 +33,7 @@ export abstract class AbstractSchema<Type=any> implements SchemaInterface<Type>
      * @param target target object to load data into
      * @return converted and validated data
      */
-    load(data: Object, target?: Type): Type
+    load(data: any, target?: Type): Type
     {
         this.reset();
         let result = target ? target : this.createObject();
@@ -57,7 +57,7 @@ export abstract class AbstractSchema<Type=any> implements SchemaInterface<Type>
      * @param data data to be dumped
      * @return raw JSON object
      */
-    dump(data: Type): Object
+    dump(data: Type): any
     {
         this.reset();
         let result = {};
