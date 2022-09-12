@@ -1035,3 +1035,80 @@ export class Raw extends AbstractField {
         return val;
     }
 }
+
+
+/**
+ * field using callbacks for loading and dumping data
+ */
+export class Callbacks extends AbstractField {
+
+    /**
+     * callback used for data load
+     */
+    loadFn: (val: any, context: any, result: any, schema: SchemaInterface | undefined) => any;
+
+    /**
+     * callback used for data dump
+     */
+    dumpFn: (val: any, context: any, result: any, schema: SchemaInterface | undefined) => any;
+
+    /**
+     * initialize instance with name set to null
+     * @param loadFn callback used for data load
+     * @param dumpFn callback used for data dump
+     * @param {AbstractFieldOptions} options additional options
+     */
+    constructor(
+        loadFn: (val: any, context: any, result: any, schema: SchemaInterface | undefined) => any,
+        dumpFn: (val: any, context: any, result: any, schema: SchemaInterface | undefined) => any,
+        options?: AbstractFieldOptions
+    );
+
+    /**
+     * initialize instance
+     * @param {string} name name of the field
+     * @param loadFn callback used for data load
+     * @param dumpFn callback used for data dump
+     * @param {AbstractFieldOptions} options additional options
+     */
+    constructor(
+        name: string|null,
+        loadFn: (val: any, context: any, result: any, schema: SchemaInterface | undefined) => any,
+        dumpFn: (val: any, context: any, result: any, schema: SchemaInterface | undefined) => any,
+        options?: AbstractFieldOptions
+    );
+
+    constructor(...args: any)
+    {
+        let name: string | null = null;
+        let options: AbstractFieldOptions | undefined;
+        let loadFn: any, dumpFn: any;
+
+        if (typeof args[0] === "string") {
+            // name is not set
+            name = args[0];
+            loadFn = args[1];
+            dumpFn = args[2];
+            options = args[1];
+        } else {
+            // name is set
+            loadFn = args[0];
+            dumpFn = args[1];
+            options = args[2];
+        }
+
+        super(name, options);
+        this.loadFn = loadFn;
+        this.dumpFn = dumpFn;
+    }
+
+
+    dump(val: any, context: any, result: any, schema: SchemaInterface | undefined): any {
+        return this.dumpFn(val, context, result, schema);
+    }
+
+    load(val: any, context: any, result: any, schema: SchemaInterface | undefined): any {
+        return this.loadFn(val, context, result, schema);
+    }
+
+}
